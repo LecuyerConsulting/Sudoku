@@ -11,7 +11,6 @@ import kotlinx.android.synthetic.main.view_square.view.*
 class SqareView : ConstraintLayout {
 
 
-
     constructor(context: Context) : this(context, null)
 
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -24,11 +23,10 @@ class SqareView : ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.view_square, this, true)
     }
 
-    fun setValue(value: Int) {
-        tvValue.text = value.toString()
+    fun setValue(value: String) {
+        tvValue.text = value
         tvValue.visibility = View.VISIBLE
         grid.visibility = View.INVISIBLE
     }
-
 
 }

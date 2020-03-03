@@ -23,7 +23,10 @@ class MainFragment : Fragment() {
 
     private val onClickListener = View.OnClickListener { v ->
         when (v) {
-            is TextView -> Log.d("tom971", "value ${v.text}")
+            is TextView -> {
+                Log.d("tom971", "value ${v.text}")
+                sudoku.setValue(v.text.toString())
+            }
         }
     }
 

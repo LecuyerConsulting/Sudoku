@@ -10,6 +10,8 @@ import com.lconsulting.sudoku.R
 
 class SudokuView : GridLayout {
 
+    private var gridViewSelected: GridView? = null
+
     constructor(context: Context) : this(context, null)
 
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -25,11 +27,15 @@ class SudokuView : GridLayout {
         forEach {
             (it as GridView).setOnGridListener(object : GridView.OnGridListener{
                 override fun onClickSquare(position: Int) {
+                    gridViewSelected = it
                     Log.d("tom971", "click grille ${it.tag} cellule $position")
                 }
             })
         }
+    }
 
+    fun setValue(value: String) {
+        gridViewSelected?.setValue(value)
     }
 
 }

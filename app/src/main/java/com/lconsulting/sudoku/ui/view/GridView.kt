@@ -12,8 +12,17 @@ class GridView : GridLayout {
 
     private var onGridListener: OnGridListener? = null
 
+    private var squareViewSelected: SqareView? = null
+
     private val onClickListener = View.OnClickListener { v ->
-        onGridListener?.onClickSquare((v.tag as String).toInt())
+        when (v) {
+            is SqareView -> {
+                squareViewSelected?.background = resources.getDrawable(R.drawable.background_square)
+                squareViewSelected = v
+                squareViewSelected?.background = resources.getDrawable(R.drawable.background_square_selected)
+                onGridListener?.onClickSquare((v.tag as String).toInt())
+            }
+        }
     }
 
     constructor(context: Context) : this(context, null)
@@ -35,6 +44,10 @@ class GridView : GridLayout {
 
     fun setOnGridListener(listener: OnGridListener) {
         onGridListener = listener
+    }
+
+    fun setValue(value: String) {
+        squareViewSelected?.setValue(value)
     }
 
     interface OnGridListener {
