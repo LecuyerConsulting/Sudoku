@@ -50,6 +50,10 @@ class GridView : GridLayout {
         squareViewSelected?.setValue(value)
     }
 
+    fun unSelectedSquare() {
+        squareViewSelected?.background = resources.getDrawable(R.drawable.background_square)
+    }
+
     interface OnGridListener {
         fun onClickSquare(position: Int)
     }

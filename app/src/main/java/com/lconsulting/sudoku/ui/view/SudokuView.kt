@@ -2,7 +2,6 @@ package com.lconsulting.sudoku.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.GridLayout
 import androidx.core.view.forEach
@@ -10,6 +9,7 @@ import com.lconsulting.sudoku.R
 
 class SudokuView : GridLayout {
 
+    private var onSudokuListener: OnSudokuListener? = null
     private var gridViewSelected: GridView? = null
 
     constructor(context: Context) : this(context, null)
@@ -25,17 +25,28 @@ class SudokuView : GridLayout {
         columnCount = 3
 
         forEach {
-            (it as GridView).setOnGridListener(object : GridView.OnGridListener{
+            (it as GridView).setOnGridListener(object : GridView.OnGridListener {
                 override fun onClickSquare(position: Int) {
+                    if (gridViewSelected != it) {
+                        gridViewSelected?.unSelectedSquare()
+                    }
                     gridViewSelected = it
-                    Log.d("tom971", "click grille ${it.tag} cellule $position")
+                    onSudokuListener?.onClickSquare(it.tag.toString().toInt(), position)
                 }
             })
         }
     }
 
+    fun setOnSudokuListener(listener: OnSudokuListener) {
+        onSudokuListener = listener
+    }
+
     fun setValue(value: String) {
         gridViewSelected?.setValue(value)
+    }
+
+    interface OnSudokuListener {
+        fun onClickSquare(grille: Int, position: Int)
     }
 
 }
