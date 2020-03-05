@@ -67,7 +67,7 @@ class MainFragment : Fragment() {
 
     private fun updateUI(state: SudokuState) {
         when (state) {
-            is SudokuState.SuccesSudokuState -> sudoku.setValue(state.value)
+            is SudokuState.SuccesSudokuState -> sudoku.setValue(state.solution)
             is SudokuState.ErrorSudokuState -> Toast.makeText(
                 requireContext(),
                 "valeur impossible",

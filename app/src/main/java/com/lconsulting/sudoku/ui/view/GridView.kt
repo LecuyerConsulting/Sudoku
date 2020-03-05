@@ -13,6 +13,7 @@ class GridView : GridLayout {
     private var onGridListener: OnGridListener? = null
 
     private var squareViewSelected: SqareView? = null
+    private val listSquareView: MutableList<SqareView> = mutableListOf()
 
     private val onClickListener = View.OnClickListener { v ->
         when (v) {
@@ -38,6 +39,7 @@ class GridView : GridLayout {
         columnCount = 3
 
         forEach {
+            listSquareView.add(it as SqareView)
             it.setOnClickListener(onClickListener)
         }
     }
@@ -46,8 +48,8 @@ class GridView : GridLayout {
         onGridListener = listener
     }
 
-    fun setValue(value: String) {
-        squareViewSelected?.setValue(value)
+    fun setValue(square: Int, solution : MutableSet<Int>) {
+        listSquareView[square].setValue(solution)
     }
 
     fun unSelectedSquare() {

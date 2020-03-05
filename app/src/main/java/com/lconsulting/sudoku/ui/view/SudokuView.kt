@@ -11,6 +11,7 @@ class SudokuView : GridLayout {
 
     private var onSudokuListener: OnSudokuListener? = null
     private var gridViewSelected: GridView? = null
+    private val listGridView: MutableList<GridView> = mutableListOf()
 
     constructor(context: Context) : this(context, null)
 
@@ -25,6 +26,7 @@ class SudokuView : GridLayout {
         columnCount = 3
 
         forEach {
+            listGridView.add(it as GridView)
             (it as GridView).setOnGridListener(object : GridView.OnGridListener {
                 override fun onClickSquare(position: Int) {
                     if (gridViewSelected != it) {
@@ -41,8 +43,15 @@ class SudokuView : GridLayout {
         onSudokuListener = listener
     }
 
-    fun setValue(value: String) {
-        gridViewSelected?.setValue(value)
+    fun setValue(solution: Array<MutableSet<Int>>) {
+        for (i in solution.indices) {
+            val posLine = i / 9
+            val posColumn = i % 9
+            val square = (posColumn % 3) + (posLine % 3) * 3
+            val grid = (posColumn / 3) + (posLine / 3) * 3
+
+            listGridView[grid].setValue(square, solution[i])
+        }
     }
 
     interface OnSudokuListener {
