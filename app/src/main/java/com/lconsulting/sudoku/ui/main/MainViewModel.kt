@@ -40,6 +40,7 @@ class MainViewModel : ViewModel() {
         while (findValue) {
             findValue = checkOneValueBySquare()
             findValue = checkOneValueByRow9Time()
+            findValue = checkOneValueByColumn9Time()
         }
     }
 
@@ -106,6 +107,48 @@ class MainViewModel : ViewModel() {
         for (i in startIndice until endIndice) {
             if (solution[i].contains(value)) {
                 return i
+            }
+        }
+        return -1
+    }
+
+    private fun checkOneValueByColumn9Time() : Boolean{
+        for (i in 0 until 9){
+            if(checkOneValueByColumn(i)){
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun checkOneValueByColumn(startIndice: Int): Boolean {
+        var result = false
+        val tabCompteur = IntArray(9) { 0 }
+
+        for (i in 0 until 9) {
+            var position = startIndice + i*9
+            if (sudoku[position] == 0) {
+                solution[position].forEach {
+                    tabCompteur[it - 1] = tabCompteur[it - 1] + 1
+                }
+            }
+        }
+
+        for (i in tabCompteur.indices){
+            if (tabCompteur[i] == 1){
+                val position = findPositionByColumn(startIndice, i+1)
+                update(i+1, position)
+            }
+        }
+
+        return result
+    }
+
+    private fun findPositionByColumn(startIndice: Int, value : Int): Int {
+        for (i in 0 until 9) {
+            var position = startIndice + i*9
+            if (solution[position].contains(value)) {
+                return position
             }
         }
         return -1
