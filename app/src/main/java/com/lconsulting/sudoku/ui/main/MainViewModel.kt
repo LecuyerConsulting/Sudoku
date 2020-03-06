@@ -12,8 +12,6 @@ class MainViewModel : ViewModel() {
 
     val state = MutableLiveData<SudokuState>()
 
-    private val sizeSudoku: Int = 9
-    private val sizeGrid: Int = 3
     private lateinit var sudoku: IntArray
     private lateinit var solution: Array<MutableSet<Int>>
 
@@ -24,29 +22,56 @@ class MainViewModel : ViewModel() {
 
     fun checkValue(value: String, g: Int, p: Int) {
         val pos =
-            (sizeGrid * (g % sizeGrid) + (p % sizeGrid)) + (((p / sizeGrid) + (g / sizeGrid) * sizeGrid) * sizeSudoku)
+            (3 * (g % 3) + (p % 3)) + (((p / 3) + (g / 3) * 3) * 9)
 
         val fillSquare = sudoku[pos] == 0
 
         if (fillSquare) {
-            updateSolution(value.toInt(), pos, g, p)
+            update(value.toInt(), pos)
+            launcAlgo()
             state.postValue(SudokuState.SuccesSudokuState(solution))
         } else {
             state.postValue(SudokuState.ErrorSudokuState)
         }
     }
 
-    private fun updateSolution(value: Int, pos: Int, g: Int, p: Int) {
-        sudoku[pos] = value
+    private fun launcAlgo() {
+        var findValue = true
+        while (findValue) {
+            findValue = checkOneValueBySquare()
+        }
+    }
+
+    private fun update(value: Int, pos: Int) {
+        updateSudoku(value, pos)
+        updateSolution(value, pos)
+    }
+
+    private fun updateSolution(value: Int, pos: Int) {
         solution[pos] = mutableSetOf(value)
         updateLine(value, pos)
         updateColumn(value, pos)
         updateGrid(value, pos)
     }
 
+    private fun updateSudoku(value: Int, pos: Int) {
+        sudoku[pos] = value
+    }
+
+    private fun checkOneValueBySquare(): Boolean {
+        var result = false
+        for (i in solution.indices) {
+            if (sudoku[i] == 0 && solution[i].size == 1) {
+                update(solution[i].toList()[0], i)
+                result = true
+            }
+        }
+        return result
+    }
+
     private fun updateLine(value: Int, pos: Int) {
-        val startIndice = (pos / sizeSudoku) * sizeSudoku
-        val endIndice = startIndice + sizeSudoku
+        val startIndice = (pos / 9) * 9
+        val endIndice = startIndice + 9
 
         for (i in startIndice until endIndice) {
             if (sudoku[i] == 0) {
@@ -57,7 +82,6 @@ class MainViewModel : ViewModel() {
 
     private fun updateColumn(value: Int, pos: Int) {
         val startIndice = pos % 9
-
         for (i in 0 until 9) {
             if (sudoku[startIndice + i * 9] == 0) {
                 solution[startIndice + i * 9].remove(value)
