@@ -49,7 +49,7 @@ class MainViewModel : ViewModel() {
 
     private fun updateSolution(value: Int, pos: Int) {
         solution[pos] = mutableSetOf(value)
-        updateLine(value, pos)
+        updateRow(value, pos)
         updateColumn(value, pos)
         updateGrid(value, pos)
     }
@@ -69,8 +69,8 @@ class MainViewModel : ViewModel() {
         return result
     }
 
-    private fun updateLine(value: Int, pos: Int) {
-        val startIndice = (pos / 9) * 9
+    private fun updateRow(value: Int, pos: Int) {
+        val startIndice = getIndiceForRow(pos)
         val endIndice = startIndice + 9
 
         for (i in startIndice until endIndice) {
@@ -81,7 +81,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun updateColumn(value: Int, pos: Int) {
-        val startIndice = pos % 9
+        val startIndice = getIndiceForColumn(pos)
         for (i in 0 until 9) {
             if (sudoku[startIndice + i * 9] == 0) {
                 solution[startIndice + i * 9].remove(value)
@@ -90,15 +90,23 @@ class MainViewModel : ViewModel() {
     }
 
     private fun updateGrid(value: Int, pos: Int) {
-        val column = pos % 9
-        val row = pos % 9
-        val startIndice = (column / 3) * 3 + ((row / 3) * 3) * 9
+        val startIndice  = getIndiceForGrid(pos)
         for (i in 0 until 9) {
             val position = startIndice + (i % 3) + ((i / 3) * 9)
             if (sudoku[position] == 0) {
                 solution[position].remove(value)
             }
         }
+    }
+
+    private fun getIndiceForRow(pos : Int) = (pos / 9) * 9
+
+    private fun getIndiceForColumn(pos : Int) =  pos % 9
+
+    private fun getIndiceForGrid(pos : Int) : Int{
+        val column = pos % 9
+        val row = pos / 9
+        return (column / 3) * 3 + ((row / 3) * 3) * 9
     }
 
 }
