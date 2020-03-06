@@ -28,20 +28,30 @@ class MainViewModel : ViewModel() {
 
         if (fillSquare) {
             update(value.toInt(), pos)
-            launcAlgo(pos)
+            var result = true
+            while (result) {
+                result = launcAlgo()
+            }
             state.postValue(SudokuState.SuccesSudokuState(solution))
         } else {
             state.postValue(SudokuState.ErrorSudokuState)
         }
     }
 
-    private fun launcAlgo(pos: Int) {
-        var findValue = true
-        while (findValue) {
-            findValue = checkOneValueBySquare()
-            findValue = checkOneValueByRow9Time()
-            findValue = checkOneValueByColumn9Time()
+    private fun launcAlgo(): Boolean {
+        if (checkOneValueBySquare()) {
+            return true
         }
+        if (checkOneValueByRow9Time()) {
+            return true
+        }
+        if (checkOneValueByColumn9Time()) {
+            return true
+        }
+        if (checkOneValueByGrid9Time()) {
+            return true
+        }
+        return false
     }
 
     private fun update(value: Int, pos: Int) {
@@ -65,15 +75,15 @@ class MainViewModel : ViewModel() {
         for (i in solution.indices) {
             if (sudoku[i] == 0 && solution[i].size == 1) {
                 update(solution[i].toList()[0], i)
-                result = true
+                return true
             }
         }
         return result
     }
 
-    private fun checkOneValueByRow9Time() : Boolean{
-        for (i in 0 until 9){
-            if(checkOneValueByRow(i*9)){
+    private fun checkOneValueByRow9Time(): Boolean {
+        for (i in 0 until 9) {
+            if (checkOneValueByRow(i * 9)) {
                 return true
             }
         }
@@ -81,7 +91,6 @@ class MainViewModel : ViewModel() {
     }
 
     private fun checkOneValueByRow(startIndice: Int): Boolean {
-        var result = false
         val endIndice = startIndice + 9
         val tabCompteur = IntArray(9) { 0 }
 
@@ -93,17 +102,18 @@ class MainViewModel : ViewModel() {
             }
         }
 
-        for (i in tabCompteur.indices){
-            if (tabCompteur[i] == 1){
-                val position = findPositionByRow(startIndice, endIndice, i+1)
-                update(i+1, position)
+        for (i in tabCompteur.indices) {
+            if (tabCompteur[i] == 1) {
+                val position = findPositionByRow(startIndice, endIndice, i + 1)
+                update(i + 1, position)
+                return true
             }
         }
 
-        return result
+        return false
     }
 
-    private fun findPositionByRow(startIndice: Int, endIndice : Int, value : Int): Int {
+    private fun findPositionByRow(startIndice: Int, endIndice: Int, value: Int): Int {
         for (i in startIndice until endIndice) {
             if (solution[i].contains(value)) {
                 return i
@@ -112,9 +122,9 @@ class MainViewModel : ViewModel() {
         return -1
     }
 
-    private fun checkOneValueByColumn9Time() : Boolean{
-        for (i in 0 until 9){
-            if(checkOneValueByColumn(i)){
+    private fun checkOneValueByColumn9Time(): Boolean {
+        for (i in 0 until 9) {
+            if (checkOneValueByColumn(i)) {
                 return true
             }
         }
@@ -122,11 +132,10 @@ class MainViewModel : ViewModel() {
     }
 
     private fun checkOneValueByColumn(startIndice: Int): Boolean {
-        var result = false
         val tabCompteur = IntArray(9) { 0 }
 
         for (i in 0 until 9) {
-            var position = startIndice + i*9
+            var position = startIndice + i * 9
             if (sudoku[position] == 0) {
                 solution[position].forEach {
                     tabCompteur[it - 1] = tabCompteur[it - 1] + 1
@@ -134,19 +143,65 @@ class MainViewModel : ViewModel() {
             }
         }
 
-        for (i in tabCompteur.indices){
-            if (tabCompteur[i] == 1){
-                val position = findPositionByColumn(startIndice, i+1)
-                update(i+1, position)
+        for (i in tabCompteur.indices) {
+            if (tabCompteur[i] == 1) {
+                val position = findPositionByColumn(startIndice, i + 1)
+                update(i + 1, position)
+                return true
             }
         }
 
-        return result
+        return false
     }
 
-    private fun findPositionByColumn(startIndice: Int, value : Int): Int {
+    private fun findPositionByColumn(startIndice: Int, value: Int): Int {
         for (i in 0 until 9) {
-            var position = startIndice + i*9
+            var position = startIndice + i * 9
+            if (solution[position].contains(value)) {
+                return position
+            }
+        }
+        return -1
+    }
+
+    private fun checkOneValueByGrid9Time(): Boolean {
+        for (i in 0 until 9) {
+            val startIndice = (3 * i) + (9 * 2 * (i / 3))
+            if (checkOneValueByGrid(startIndice)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun checkOneValueByGrid(startIndice: Int): Boolean {
+        var result = false
+
+        val tabCompteur = IntArray(9) { 0 }
+
+        for (i in 0 until 9) {
+            var position = startIndice + (i % 3) + ((i / 3) * 9)
+            if (sudoku[position] == 0) {
+                solution[position].forEach {
+                    tabCompteur[it - 1] = tabCompteur[it - 1] + 1
+                }
+            }
+        }
+
+        for (i in tabCompteur.indices) {
+            if (tabCompteur[i] == 1) {
+                val position = findPositionByGrid(startIndice, i + 1)
+                update(i + 1, position)
+                return true
+            }
+        }
+
+        return false
+    }
+
+    private fun findPositionByGrid(startIndice: Int, value: Int): Int {
+        for (i in 0 until 9) {
+            var position = startIndice + (i % 3) + ((i / 3) * 9)
             if (solution[position].contains(value)) {
                 return position
             }
