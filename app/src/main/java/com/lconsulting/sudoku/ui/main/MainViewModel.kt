@@ -17,7 +17,8 @@ class MainViewModel : ViewModel() {
 
     fun resetSudoku() {
         sudoku = IntArray(81) { 0 }
-        solution = Array(81, { i -> mutableSetOf(1, 2, 3, 4, 5, 6, 7, 8, 9) })
+        solution = Array(81) { mutableSetOf(1, 2, 3, 4, 5, 6, 7, 8, 9) }
+        state.postValue(SudokuState.SuccesSudokuState(solution))
     }
 
     fun checkValue(value: String, g: Int, p: Int) {
@@ -30,7 +31,7 @@ class MainViewModel : ViewModel() {
             update(value.toInt(), pos)
             var result = true
             while (result) {
-                result = launcAlgo()
+                result = launchAlgo()
             }
             state.postValue(SudokuState.SuccesSudokuState(solution))
         } else {
@@ -38,17 +39,17 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    private fun launcAlgo(): Boolean {
+    private fun launchAlgo(): Boolean {
         if (checkOneValueBySquare()) {
             return true
         }
-        if (checkOneValueByRow9Time()) {
+        if (checkOneValue9Time(::getPositionForRowBy9, ::getPositionForRow, ::findPositionByRow)) {
             return true
         }
-        if (checkOneValueByColumn9Time()) {
+        if (checkOneValue9Time(::getPositionForColumnBy9, ::getPositionForColumn, ::findPositionByColumn)) {
             return true
         }
-        if (checkOneValueByGrid9Time()) {
+        if (checkOneValue9Time(::getPositionForGridBy9, ::getPositionForGrid, ::findPositionByGrid)) {
             return true
         }
         return false
@@ -62,7 +63,11 @@ class MainViewModel : ViewModel() {
         updateSolution(value, getIndiceForGrid(pos), ::getPositionForGrid)
     }
 
-    private fun updateSolution(value: Int, startIndice: Int, getPosition: (start: Int, index: Int) -> Int) {
+    private fun updateSolution(
+        value: Int,
+        startIndice: Int,
+        getPosition: (start: Int, index: Int) -> Int
+    ) {
         for (i in 0 until 9) {
             val position = getPosition(startIndice, i)
             if (sudoku[position] == 0) {
@@ -82,61 +87,28 @@ class MainViewModel : ViewModel() {
         return result
     }
 
-    private fun checkOneValueByRow9Time(): Boolean {
+    private fun checkOneValue9Time(
+        getPositionBy9: (i: Int) -> Int,
+        getPosition: (start: Int, index: Int) -> Int,
+        findPosition: (start: Int, value: Int) -> Int
+    ): Boolean {
         for (i in 0 until 9) {
-            if (checkOneValueByRow(i * 9)) {
+            if (checkOneValue(getPositionBy9(i), getPosition, findPosition)) {
                 return true
             }
         }
         return false
     }
 
-    private fun checkOneValueByRow(startIndice: Int): Boolean {
-        val endIndice = startIndice + 9
-        val tabCompteur = IntArray(9) { 0 }
-
-        for (i in startIndice until endIndice) {
-            if (sudoku[i] == 0) {
-                solution[i].forEach {
-                    tabCompteur[it - 1] = tabCompteur[it - 1] + 1
-                }
-            }
-        }
-
-        for (i in tabCompteur.indices) {
-            if (tabCompteur[i] == 1) {
-                val position = findPositionByRow(startIndice, endIndice, i + 1)
-                update(i + 1, position)
-                return true
-            }
-        }
-
-        return false
-    }
-
-    private fun findPositionByRow(startIndice: Int, endIndice: Int, value: Int): Int {
-        for (i in startIndice until endIndice) {
-            if (solution[i].contains(value)) {
-                return i
-            }
-        }
-        return -1
-    }
-
-    private fun checkOneValueByColumn9Time(): Boolean {
-        for (i in 0 until 9) {
-            if (checkOneValueByColumn(i)) {
-                return true
-            }
-        }
-        return false
-    }
-
-    private fun checkOneValueByColumn(startIndice: Int): Boolean {
+    private fun checkOneValue(
+        startIndice: Int,
+        getPosition: (start: Int, index: Int) -> Int,
+        findPosition: (start: Int, value: Int) -> Int
+    ): Boolean {
         val tabCompteur = IntArray(9) { 0 }
 
         for (i in 0 until 9) {
-            var position = startIndice + i * 9
+            var position = getPosition(startIndice, i)
             if (sudoku[position] == 0) {
                 solution[position].forEach {
                     tabCompteur[it - 1] = tabCompteur[it - 1] + 1
@@ -146,13 +118,23 @@ class MainViewModel : ViewModel() {
 
         for (i in tabCompteur.indices) {
             if (tabCompteur[i] == 1) {
-                val position = findPositionByColumn(startIndice, i + 1)
+                val position = findPosition(startIndice, i + 1)
                 update(i + 1, position)
                 return true
             }
         }
 
         return false
+    }
+
+    private fun findPositionByRow(startIndice: Int, value: Int): Int {
+        for (i in 0 until 9) {
+            var position = startIndice + i
+            if (solution[position].contains(value)) {
+                return position
+            }
+        }
+        return -1
     }
 
     private fun findPositionByColumn(startIndice: Int, value: Int): Int {
@@ -165,39 +147,6 @@ class MainViewModel : ViewModel() {
         return -1
     }
 
-    private fun checkOneValueByGrid9Time(): Boolean {
-        for (i in 0 until 9) {
-            val startIndice = (3 * i) + (9 * 2 * (i / 3))
-            if (checkOneValueByGrid(startIndice)) {
-                return true
-            }
-        }
-        return false
-    }
-
-    private fun checkOneValueByGrid(startIndice: Int): Boolean {
-        val tabCompteur = IntArray(9) { 0 }
-
-        for (i in 0 until 9) {
-            var position = startIndice + (i % 3) + ((i / 3) * 9)
-            if (sudoku[position] == 0) {
-                solution[position].forEach {
-                    tabCompteur[it - 1] = tabCompteur[it - 1] + 1
-                }
-            }
-        }
-
-        for (i in tabCompteur.indices) {
-            if (tabCompteur[i] == 1) {
-                val position = findPositionByGrid(startIndice, i + 1)
-                update(i + 1, position)
-                return true
-            }
-        }
-
-        return false
-    }
-
     private fun findPositionByGrid(startIndice: Int, value: Int): Int {
         for (i in 0 until 9) {
             var position = startIndice + (i % 3) + ((i / 3) * 9)
@@ -207,6 +156,12 @@ class MainViewModel : ViewModel() {
         }
         return -1
     }
+
+    private fun getPositionForColumnBy9(i: Int): Int = i
+
+    private fun getPositionForGridBy9(i: Int): Int = (3 * i) + (9 * 2 * (i / 3))
+
+    private fun getPositionForRowBy9(i: Int): Int = i * 9
 
     private fun getPositionForRow(startIndice: Int, i: Int): Int = startIndice + i
 
