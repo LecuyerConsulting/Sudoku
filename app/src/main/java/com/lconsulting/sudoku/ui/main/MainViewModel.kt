@@ -28,17 +28,18 @@ class MainViewModel : ViewModel() {
 
         if (fillSquare) {
             update(value.toInt(), pos)
-            launcAlgo()
+            launcAlgo(pos)
             state.postValue(SudokuState.SuccesSudokuState(solution))
         } else {
             state.postValue(SudokuState.ErrorSudokuState)
         }
     }
 
-    private fun launcAlgo() {
+    private fun launcAlgo(pos: Int) {
         var findValue = true
         while (findValue) {
             findValue = checkOneValueBySquare()
+            findValue = checkOneValueByRow9Time()
         }
     }
 
@@ -69,6 +70,47 @@ class MainViewModel : ViewModel() {
         return result
     }
 
+    private fun checkOneValueByRow9Time() : Boolean{
+        for (i in 0 until 9){
+            if(checkOneValueByRow(i*9)){
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun checkOneValueByRow(startIndice: Int): Boolean {
+        var result = false
+        val endIndice = startIndice + 9
+        val tabCompteur = IntArray(9) { 0 }
+
+        for (i in startIndice until endIndice) {
+            if (sudoku[i] == 0) {
+                solution[i].forEach {
+                    tabCompteur[it - 1] = tabCompteur[it - 1] + 1
+                }
+            }
+        }
+
+        for (i in tabCompteur.indices){
+            if (tabCompteur[i] == 1){
+                val position = findPositionByRow(startIndice, endIndice, i+1)
+                update(i+1, position)
+            }
+        }
+
+        return result
+    }
+
+    private fun findPositionByRow(startIndice: Int, endIndice : Int, value : Int): Int {
+        for (i in startIndice until endIndice) {
+            if (solution[i].contains(value)) {
+                return i
+            }
+        }
+        return -1
+    }
+
     private fun updateRow(value: Int, pos: Int) {
         val startIndice = getIndiceForRow(pos)
         val endIndice = startIndice + 9
@@ -90,7 +132,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun updateGrid(value: Int, pos: Int) {
-        val startIndice  = getIndiceForGrid(pos)
+        val startIndice = getIndiceForGrid(pos)
         for (i in 0 until 9) {
             val position = startIndice + (i % 3) + ((i / 3) * 9)
             if (sudoku[position] == 0) {
@@ -99,11 +141,11 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    private fun getIndiceForRow(pos : Int) = (pos / 9) * 9
+    private fun getIndiceForRow(pos: Int) = (pos / 9) * 9
 
-    private fun getIndiceForColumn(pos : Int) =  pos % 9
+    private fun getIndiceForColumn(pos: Int) = pos % 9
 
-    private fun getIndiceForGrid(pos : Int) : Int{
+    private fun getIndiceForGrid(pos: Int): Int {
         val column = pos % 9
         val row = pos / 9
         return (column / 3) * 3 + ((row / 3) * 3) * 9
