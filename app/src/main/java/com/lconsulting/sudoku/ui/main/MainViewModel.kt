@@ -14,6 +14,7 @@ sealed class SudokuState {
     ) :
         SudokuState()
 
+    class DisplayButtonState(val possibility: MutableSet<Int>) : SudokuState()
     class ResetSudokuState(val solution: Array<SquareData>) : SudokuState()
     object InsertValueSudokuState : SudokuState()
     object ErrorSudokuState : SudokuState()
@@ -30,26 +31,34 @@ class MainViewModel : ViewModel() {
         state.postValue(SudokuState.ResetSudokuState(solution))
     }
 
+    fun getNumberAvailable(g: Int, p: Int) {
+        val pos = getPosition(g, p)
+        val squareData = solution[pos]
+        state.postValue(SudokuState.DisplayButtonState(squareData.possibility))
+    }
+
     fun checkValue(sValue: String, g: Int, p: Int) {
-        val pos =
-            (3 * (g % 3) + (p % 3)) + (((p / 3) + (g / 3) * 3) * 9)
+        val pos = getPosition(g, p)
 
-        val fillSquare = solution[pos].value == 0
+        val newValue = sValue.toInt()
+        val oldValue = solution[pos].value
 
-        if (fillSquare) {
-            val value = sValue.toInt()
-            update(value, R.color.colorValue, pos)
-
-            state.postValue(
-                SudokuState.FillSquareSudokuState(
-                    solution,
-                    R.string.insert_value,
-                    value
-                )
-            )
-        } else {
-            state.postValue(SudokuState.ErrorSudokuState)
+        if (oldValue != 0) {
+            updateSolution(oldValue, getIndiceForColumn(pos), ::getPositionForColumn, ::add)
+            updateSolution(oldValue, getIndiceForRow(pos), ::getPositionForRow, ::add)
+            updateSolution(oldValue, getIndiceForGrid(pos), ::getPositionForGrid, ::add)
+            solution[pos].value = 0
         }
+
+        update(newValue, R.color.colorValue, pos)
+
+        state.postValue(
+            SudokuState.FillSquareSudokuState(
+                solution,
+                R.string.insert_value,
+                newValue
+            )
+        )
     }
 
     fun startAlgo() {
@@ -62,7 +71,13 @@ class MainViewModel : ViewModel() {
         if (checkOneValueBySquare()) {
             return true
         }
-        if (checkOneValue9Time(::getPositionForRowBy9, ::getPositionForRow, ::findPositionByRow, R.string.one_value_by_row)) {
+        if (checkOneValue9Time(
+                ::getPositionForRowBy9,
+                ::getPositionForRow,
+                ::findPositionByRow,
+                R.string.one_value_by_row
+            )
+        ) {
             return true
         }
         if (checkOneValue9Time(
@@ -90,25 +105,33 @@ class MainViewModel : ViewModel() {
         solution[pos].let {
             it.value = value
             it.textColor = textColor
-            it.possibility = mutableSetOf()
         }
 
-        updateSolution(value, getIndiceForColumn(pos), ::getPositionForColumn)
-        updateSolution(value, getIndiceForRow(pos), ::getPositionForRow)
-        updateSolution(value, getIndiceForGrid(pos), ::getPositionForGrid)
+        updateSolution(value, getIndiceForColumn(pos), ::getPositionForColumn, ::remove)
+        updateSolution(value, getIndiceForRow(pos), ::getPositionForRow, ::remove)
+        updateSolution(value, getIndiceForGrid(pos), ::getPositionForGrid, ::remove)
     }
 
     private fun updateSolution(
         value: Int,
         startIndice: Int,
-        getPosition: (start: Int, index: Int) -> Int
+        getPosition: (start: Int, index: Int) -> Int,
+        action: (squareData: SquareData, value: Int) -> Unit
     ) {
         for (i in 0 until 9) {
             val position = getPosition(startIndice, i)
-            if (solution[position].value == 0) {
-                solution[position].possibility.remove(value)
+            if (solution[position].value != value) {
+                action(solution[position], value)
             }
         }
+    }
+
+    private fun remove(squareData: SquareData, value: Int) {
+        squareData.possibility.remove(value)
+    }
+
+    private fun add(squareData: SquareData, value: Int) {
+        squareData.possibility.add(value)
     }
 
     private fun checkOneValueBySquare(): Boolean {
@@ -148,7 +171,7 @@ class MainViewModel : ViewModel() {
         startIndice: Int,
         getPosition: (start: Int, index: Int) -> Int,
         findPosition: (start: Int, value: Int) -> Int,
-        idRessource : Int
+        idRessource: Int
     ): Boolean {
         val tabCompteur = IntArray(9) { 0 }
 
@@ -233,4 +256,6 @@ class MainViewModel : ViewModel() {
         return (column / 3) * 3 + ((row / 3) * 3) * 9
     }
 
+    private fun getPosition(g: Int, p: Int) =
+        (3 * (g % 3) + (p % 3)) + (((p / 3) + (g / 3) * 3) * 9)
 }

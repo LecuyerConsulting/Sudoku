@@ -37,6 +37,7 @@ class MainFragment : Fragment() {
         override fun onClickSquare(g: Int, p: Int) {
             line = g
             position = p
+            viewModel.getNumberAvailable(g, p)
         }
     }
 
@@ -85,9 +86,9 @@ class MainFragment : Fragment() {
             is SudokuState.FillSquareSudokuState -> {
                 sudoku.setValue(state.solution)
                 tvState.text = resources.getString(state.idRessource, state.value)
-                Handler().postDelayed({
-                    viewModel.startAlgo()
-                }, 5000)
+//                Handler().postDelayed({
+//                    viewModel.startAlgo()
+//                }, 5000)
             }
             is SudokuState.ResetSudokuState ->{
                 sudoku.setValue(state.solution)
@@ -104,6 +105,14 @@ class MainFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+            is SudokuState.DisplayButtonState -> refreshButtonNumber(state.possibility)
+        }
+    }
+
+    private fun refreshButtonNumber(possibility: MutableSet<Int>) {
+        llButton.forEach {
+            val tv = it as TextView
+            tv.isEnabled = possibility.contains(tv.text.toString().toInt())
         }
     }
 
