@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
 import com.lconsulting.sudoku.R
+import com.lconsulting.sudoku.ui.data.SquareData
 import kotlinx.android.synthetic.main.view_square.view.*
 
 class SqareView : ConstraintLayout {
@@ -29,18 +30,21 @@ class SqareView : ConstraintLayout {
         }
     }
 
-    fun setValue(solution : MutableSet<Int>) {
-        if(solution.size == 1){
-            tvValue.text = solution.toList()[0].toString()
+    fun setValue(square: SquareData) {
+        if (square.value != 0) {
+            tvValue.text = square.value.toString()
             tvValue.visibility = View.VISIBLE
+            tvValue.setTextColor(
+                resources.getColor(square.textColor)
+            )
             grid.visibility = View.INVISIBLE
-        }else{
+        } else {
             tvValue.visibility = View.INVISIBLE
             grid.visibility = View.VISIBLE
             listSquareView.forEach {
-                if(solution.contains(it.text.toString().toInt())){
+                if (square.possibility.contains(it.text.toString().toInt())) {
                     it.visibility = View.VISIBLE
-                }else{
+                } else {
                     it.visibility = View.INVISIBLE
                 }
             }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.GridLayout
 import androidx.core.view.forEach
 import com.lconsulting.sudoku.R
+import com.lconsulting.sudoku.ui.data.SquareData
 
 class SudokuView : GridLayout {
 
@@ -43,7 +44,7 @@ class SudokuView : GridLayout {
         onSudokuListener = listener
     }
 
-    fun setValue(solution: Array<MutableSet<Int>>) {
+    fun setValue(solution: Array<SquareData>) {
         for (i in solution.indices) {
             val posLine = i / 9
             val posColumn = i % 9

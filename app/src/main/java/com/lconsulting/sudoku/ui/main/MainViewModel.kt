@@ -2,9 +2,20 @@ package com.lconsulting.sudoku.ui.main
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.lconsulting.sudoku.R
+import com.lconsulting.sudoku.ui.data.SquareData
+
 
 sealed class SudokuState {
-    class SuccesSudokuState(val solution: Array<MutableSet<Int>>) : SudokuState()
+    class FillSquareSudokuState(
+        val solution: Array<SquareData>,
+        val idRessource: Int,
+        val value: Int
+    ) :
+        SudokuState()
+
+    class ResetSudokuState(val solution: Array<SquareData>) : SudokuState()
+    object InsertValueSudokuState : SudokuState()
     object ErrorSudokuState : SudokuState()
 }
 
@@ -12,30 +23,38 @@ class MainViewModel : ViewModel() {
 
     val state = MutableLiveData<SudokuState>()
 
-    private lateinit var sudoku: IntArray
-    private lateinit var solution: Array<MutableSet<Int>>
+    private lateinit var solution: Array<SquareData>
 
     fun resetSudoku() {
-        sudoku = IntArray(81) { 0 }
-        solution = Array(81) { mutableSetOf(1, 2, 3, 4, 5, 6, 7, 8, 9) }
-        state.postValue(SudokuState.SuccesSudokuState(solution))
+        solution = Array(81) { SquareData() }
+        state.postValue(SudokuState.ResetSudokuState(solution))
     }
 
-    fun checkValue(value: String, g: Int, p: Int) {
+    fun checkValue(sValue: String, g: Int, p: Int) {
         val pos =
             (3 * (g % 3) + (p % 3)) + (((p / 3) + (g / 3) * 3) * 9)
 
-        val fillSquare = sudoku[pos] == 0
+        val fillSquare = solution[pos].value == 0
 
         if (fillSquare) {
-            update(value.toInt(), pos)
-            var result = true
-            while (result) {
-                result = launchAlgo()
-            }
-            state.postValue(SudokuState.SuccesSudokuState(solution))
+            val value = sValue.toInt()
+            update(value, R.color.colorValue, pos)
+
+            state.postValue(
+                SudokuState.FillSquareSudokuState(
+                    solution,
+                    R.string.insert_value,
+                    value
+                )
+            )
         } else {
             state.postValue(SudokuState.ErrorSudokuState)
+        }
+    }
+
+    fun startAlgo() {
+        if (!launchAlgo()) {
+            state.postValue(SudokuState.InsertValueSudokuState)
         }
     }
 
@@ -43,21 +62,37 @@ class MainViewModel : ViewModel() {
         if (checkOneValueBySquare()) {
             return true
         }
-        if (checkOneValue9Time(::getPositionForRowBy9, ::getPositionForRow, ::findPositionByRow)) {
+        if (checkOneValue9Time(::getPositionForRowBy9, ::getPositionForRow, ::findPositionByRow, R.string.one_value_by_row)) {
             return true
         }
-        if (checkOneValue9Time(::getPositionForColumnBy9, ::getPositionForColumn, ::findPositionByColumn)) {
+        if (checkOneValue9Time(
+                ::getPositionForColumnBy9,
+                ::getPositionForColumn,
+                ::findPositionByColumn,
+                R.string.one_value_by_column
+            )
+        ) {
             return true
         }
-        if (checkOneValue9Time(::getPositionForGridBy9, ::getPositionForGrid, ::findPositionByGrid)) {
+        if (checkOneValue9Time(
+                ::getPositionForGridBy9,
+                ::getPositionForGrid,
+                ::findPositionByGrid,
+                R.string.one_value_by_grid
+            )
+        ) {
             return true
         }
         return false
     }
 
-    private fun update(value: Int, pos: Int) {
-        sudoku[pos] = value
-        solution[pos] = mutableSetOf(value)
+    private fun update(value: Int, textColor: Int, pos: Int) {
+        solution[pos].let {
+            it.value = value
+            it.textColor = textColor
+            it.possibility = mutableSetOf()
+        }
+
         updateSolution(value, getIndiceForColumn(pos), ::getPositionForColumn)
         updateSolution(value, getIndiceForRow(pos), ::getPositionForRow)
         updateSolution(value, getIndiceForGrid(pos), ::getPositionForGrid)
@@ -70,8 +105,8 @@ class MainViewModel : ViewModel() {
     ) {
         for (i in 0 until 9) {
             val position = getPosition(startIndice, i)
-            if (sudoku[position] == 0) {
-                solution[position].remove(value)
+            if (solution[position].value == 0) {
+                solution[position].possibility.remove(value)
             }
         }
     }
@@ -79,8 +114,16 @@ class MainViewModel : ViewModel() {
     private fun checkOneValueBySquare(): Boolean {
         var result = false
         for (i in solution.indices) {
-            if (sudoku[i] == 0 && solution[i].size == 1) {
-                update(solution[i].toList()[0], i)
+            if (solution[i].value == 0 && solution[i].possibility.size == 1) {
+                val value = solution[i].possibility.toList()[0]
+                update(value, R.color.colorValueFound, i)
+                state.postValue(
+                    SudokuState.FillSquareSudokuState(
+                        solution,
+                        R.string.one_value_by_square,
+                        value
+                    )
+                )
                 return true
             }
         }
@@ -90,10 +133,11 @@ class MainViewModel : ViewModel() {
     private fun checkOneValue9Time(
         getPositionBy9: (i: Int) -> Int,
         getPosition: (start: Int, index: Int) -> Int,
-        findPosition: (start: Int, value: Int) -> Int
+        findPosition: (start: Int, value: Int) -> Int,
+        idRessource: Int
     ): Boolean {
         for (i in 0 until 9) {
-            if (checkOneValue(getPositionBy9(i), getPosition, findPosition)) {
+            if (checkOneValue(getPositionBy9(i), getPosition, findPosition, idRessource)) {
                 return true
             }
         }
@@ -103,14 +147,15 @@ class MainViewModel : ViewModel() {
     private fun checkOneValue(
         startIndice: Int,
         getPosition: (start: Int, index: Int) -> Int,
-        findPosition: (start: Int, value: Int) -> Int
+        findPosition: (start: Int, value: Int) -> Int,
+        idRessource : Int
     ): Boolean {
         val tabCompteur = IntArray(9) { 0 }
 
         for (i in 0 until 9) {
             var position = getPosition(startIndice, i)
-            if (sudoku[position] == 0) {
-                solution[position].forEach {
+            if (solution[position].value == 0) {
+                solution[position].possibility.forEach {
                     tabCompteur[it - 1] = tabCompteur[it - 1] + 1
                 }
             }
@@ -118,8 +163,16 @@ class MainViewModel : ViewModel() {
 
         for (i in tabCompteur.indices) {
             if (tabCompteur[i] == 1) {
-                val position = findPosition(startIndice, i + 1)
-                update(i + 1, position)
+                val value = i + 1
+                val position = findPosition(startIndice, value)
+                update(value, R.color.colorValueFound, position)
+                state.postValue(
+                    SudokuState.FillSquareSudokuState(
+                        solution,
+                        idRessource,
+                        value
+                    )
+                )
                 return true
             }
         }
@@ -130,7 +183,7 @@ class MainViewModel : ViewModel() {
     private fun findPositionByRow(startIndice: Int, value: Int): Int {
         for (i in 0 until 9) {
             var position = startIndice + i
-            if (solution[position].contains(value)) {
+            if (solution[position].possibility.contains(value)) {
                 return position
             }
         }
@@ -140,7 +193,7 @@ class MainViewModel : ViewModel() {
     private fun findPositionByColumn(startIndice: Int, value: Int): Int {
         for (i in 0 until 9) {
             var position = startIndice + i * 9
-            if (solution[position].contains(value)) {
+            if (solution[position].possibility.contains(value)) {
                 return position
             }
         }
@@ -150,7 +203,7 @@ class MainViewModel : ViewModel() {
     private fun findPositionByGrid(startIndice: Int, value: Int): Int {
         for (i in 0 until 9) {
             var position = startIndice + (i % 3) + ((i / 3) * 9)
-            if (solution[position].contains(value)) {
+            if (solution[position].possibility.contains(value)) {
                 return position
             }
         }

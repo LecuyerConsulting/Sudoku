@@ -1,6 +1,7 @@
 package com.lconsulting.sudoku.ui.main
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,12 +68,28 @@ class MainFragment : Fragment() {
 
     private fun updateUI(state: SudokuState) {
         when (state) {
-            is SudokuState.SuccesSudokuState -> sudoku.setValue(state.solution)
-            is SudokuState.ErrorSudokuState -> Toast.makeText(
-                requireContext(),
-                "valeur impossible",
-                Toast.LENGTH_SHORT
-            ).show()
+            is SudokuState.FillSquareSudokuState -> {
+                sudoku.setValue(state.solution)
+                tvState.text = resources.getString(state.idRessource, state.value)
+                Handler().postDelayed({
+                    viewModel.startAlgo()
+                }, 5000)
+            }
+            is SudokuState.ResetSudokuState ->{
+                sudoku.setValue(state.solution)
+                tvState.text = resources.getString(R.string.insert_a_value)
+            }
+            is SudokuState.InsertValueSudokuState -> {
+                tvState.text = resources.getString(R.string.insert_a_value)
+            }
+            is SudokuState.ErrorSudokuState -> {
+                tvState.text = resources.getString(R.string.insert_a_value)
+                Toast.makeText(
+                    requireContext(),
+                    "valeur impossible",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
