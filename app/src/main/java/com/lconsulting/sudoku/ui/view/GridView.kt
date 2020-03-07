@@ -51,6 +51,7 @@ class GridView : GridLayout {
 
     fun setValue(square: Int, solution : SquareData) {
         listSquareView[square].setValue(solution)
+        squareViewSelected?.background = resources.getDrawable(R.drawable.background_square)
     }
 
     fun unSelectedSquare() {
