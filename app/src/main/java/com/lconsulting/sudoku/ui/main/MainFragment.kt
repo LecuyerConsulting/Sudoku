@@ -34,7 +34,7 @@ class MainFragment : Fragment() {
 
     private var idGrid: Int = 0
     private var idSquare: Int = 0
-    private var isRepeat : Boolean = false
+    private var isRepeat: Boolean = false
 
     private val onClickListener = View.OnClickListener { v ->
         when (v) {
@@ -44,18 +44,14 @@ class MainFragment : Fragment() {
             }
             else -> when (v.id) {
                 R.id.btnPlay -> {
-                    if(statePlayer == STOP){
-                        btnPlay.setImageDrawable(resources.getDrawable(R.drawable.baseline_play_arrow_black_24))
-                        statePlayer = PLAY
-                        isRepeat = false
-                    }else {
+                    if (statePlayer == STOP) {
+                        setRepeatMode(PLAY, R.drawable.baseline_play_arrow_black_24, false)
+                    } else {
                         viewModel.startAlgo()
                     }
                 }
                 R.id.btnRepeat -> {
-                    statePlayer = STOP
-                    btnPlay.setImageDrawable(resources.getDrawable(R.drawable.baseline_stop_black_24))
-                    isRepeat = true
+                    setRepeatMode(STOP, R.drawable.baseline_stop_black_24, true)
                     viewModel.startAlgo()
                 }
             }
@@ -101,15 +97,15 @@ class MainFragment : Fragment() {
         sudoku.setOnSudokuListener(onSudokuListener)
 
         disableDigitsButton()
-        disableActionButton()
+        hideActionButton()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_main,menu)
+        inflater.inflate(R.menu.menu_main, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.menu_reset -> viewModel.reset()
         }
         return super.onOptionsItemSelected(item)
@@ -123,15 +119,15 @@ class MainFragment : Fragment() {
             }
             is SudokuState.FillSquareAlgo -> {
                 tvState.text = resources.getString(state.idRes, state.value)
-                sudoku.selectSquare(state.idGrid ,state.idSquare, state.value)
+                sudoku.selectSquare(state.idGrid, state.idSquare, state.value)
                 Handler().postDelayed({
                     sudoku.updateSudoku(state.sudoku)
-                    if (isRepeat){
+                    if (isRepeat) {
                         viewModel.startAlgo()
                     }
                 }, 500)
             }
-            is SudokuState.Reset ->{
+            is SudokuState.Reset -> {
                 sudoku.updateSudoku(state.solution)
                 tvState.text = resources.getString(R.string.insert_a_value)
             }
@@ -139,22 +135,29 @@ class MainFragment : Fragment() {
                 tvState.text = resources.getString(R.string.insert_a_value)
             }
             is SudokuState.DisplayMessage -> {
+                setRepeatMode(PLAY, R.drawable.baseline_play_arrow_black_24, false)
                 tvState.text = resources.getString(state.idResString)
             }
             is SudokuState.DisplayButton -> updateDigitsButton(state.possibility)
         }
     }
 
-    private fun disableDigitsButton(){
+    private fun setRepeatMode(@StateResolver state: Int, idResDrawable: Int, isRepeat: Boolean) {
+        statePlayer = state
+        btnPlay.setImageDrawable(resources.getDrawable(idResDrawable))
+        this.isRepeat = isRepeat
+    }
+
+    private fun disableDigitsButton() {
         llButton.forEach {
             val tv = it as TextView
             tv.isEnabled = false
         }
     }
 
-    private fun disableActionButton() {
-        btnPrevious.isEnabled  = false
-        btnNext.isEnabled = false
+    private fun hideActionButton() {
+        btnPrevious.visibility = View.INVISIBLE
+        btnNext.visibility = View.INVISIBLE
     }
 
     private fun updateDigitsButton(possibility: MutableSet<Int>) {

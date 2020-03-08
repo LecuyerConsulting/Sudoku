@@ -110,7 +110,7 @@ class SudokuViewModel : ViewModel() {
 
     fun startAlgo() {
         if(digitsToFind == 0){
-            state.postValue(SudokuState.DisplayMessage(R.string.succes_sudoku))
+            state.postValue(SudokuState.DisplayMessage(R.string.success_sudoku))
         }else if (!searchValue()) {
             state.postValue(SudokuState.DisplayMessage(R.string.error_sudoku))
         }
