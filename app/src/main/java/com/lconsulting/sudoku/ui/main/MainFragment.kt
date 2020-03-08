@@ -18,16 +18,17 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
-    private lateinit var viewModel: MainViewModel
+    private lateinit var viewModel: SudokuViewModel
 
-    private var line: Int = 0
-    private var position: Int = 0
+    private var idGrid: Int = 0
+    private var idSquare: Int = 0
     private var isRepeat : Boolean = false
 
     private val onClickListener = View.OnClickListener { v ->
         when (v) {
             is TextView -> {
-                viewModel.checkValue(v.text.toString(), line, position)
+                viewModel.insertValueByUser(v.text.toString(), idGrid, idSquare)
+                disableDigitsButton()
             }
             else -> when (v.id) {
                 R.id.bPlay -> viewModel.startAlgo()
@@ -38,18 +39,17 @@ class MainFragment : Fragment() {
     }
 
     private val onSudokuListener = object : SudokuView.OnSudokuListener {
-        override fun onClickSquare(g: Int, p: Int) {
-            line = g
-            position = p
-            viewModel.getNumberAvailable(g, p)
+        override fun onClickSquare(idGrid: Int, idSquare: Int) {
+            this@MainFragment.idGrid = idGrid
+            this@MainFragment.idSquare = idSquare
+            viewModel.getDigitAvailable(idGrid, idSquare)
         }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(SudokuViewModel::class.java)
         viewModel.state.observe(this, Observer { updateUI(it) })
-        viewModel.resetSudoku()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +75,8 @@ class MainFragment : Fragment() {
         }
 
         sudoku.setOnSudokuListener(onSudokuListener)
+
+        disableDigitsButton()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -83,42 +85,49 @@ class MainFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            R.id.menu_reset -> viewModel.resetSudoku()
+            R.id.menu_reset -> viewModel.reset()
         }
         return super.onOptionsItemSelected(item)
     }
 
     private fun updateUI(state: SudokuState) {
         when (state) {
-            is SudokuState.FillSquareSudokuState -> {
-                sudoku.setValue(state.solution)
+            is SudokuState.FillSquare -> {
+                sudoku.updateSudoku(state.sudoku)
                 tvState.text = resources.getString(state.idRes, state.value)
             }
-            is SudokuState.FillSquareAlgoSudokuState -> {
+            is SudokuState.FillSquareAlgo -> {
                 tvState.text = resources.getString(state.idRes, state.value)
-                sudoku.squareSelected(state.idGrid ,state.idSquare, state.value)
+                sudoku.selectSquare(state.idGrid ,state.idSquare, state.value)
                 Handler().postDelayed({
-                    sudoku.setValue(state.solution)
+                    sudoku.updateSudoku(state.sudoku)
                     if (isRepeat){
                         viewModel.startAlgo()
                     }
-                }, 500)
+                }, 2500)
             }
-            is SudokuState.ResetSudokuState ->{
-                sudoku.setValue(state.solution)
+            is SudokuState.Reset ->{
+                sudoku.updateSudoku(state.solution)
                 tvState.text = resources.getString(R.string.insert_a_value)
             }
-            is SudokuState.InsertValueSudokuState -> {
+            is SudokuState.InsertValue -> {
                 tvState.text = resources.getString(R.string.insert_a_value)
             }
-            is SudokuState.ErrorSudokuState -> {
+            is SudokuState.Error -> {
                 tvState.text = resources.getString(R.string.error_sudoku)
             }
-            is SudokuState.DisplayButtonState -> refreshButtonNumber(state.possibility)
+            is SudokuState.DisplayButton -> updateDigitsButton(state.possibility)
         }
     }
 
-    private fun refreshButtonNumber(possibility: MutableSet<Int>) {
+    private fun disableDigitsButton(){
+        llButton.forEach {
+            val tv = it as TextView
+            tv.isEnabled = false
+        }
+    }
+
+    private fun updateDigitsButton(possibility: MutableSet<Int>) {
         llButton.forEach {
             val tv = it as TextView
             tv.isEnabled = possibility.contains(tv.text.toString().toInt())

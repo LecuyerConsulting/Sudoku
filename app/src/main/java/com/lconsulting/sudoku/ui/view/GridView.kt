@@ -3,7 +3,7 @@ package com.lconsulting.sudoku.ui.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
+import android.view.View.OnClickListener
 import android.widget.GridLayout
 import androidx.core.view.forEach
 import com.lconsulting.sudoku.R
@@ -16,12 +16,12 @@ class GridView : GridLayout {
     private var squareViewSelected: SqareView? = null
     private val listSquareView: MutableList<SqareView> = mutableListOf()
 
-    private val onClickListener = View.OnClickListener { v ->
+    private val onClickListener = OnClickListener { v ->
         when (v) {
             is SqareView -> {
-                squareViewSelected?.background = resources.getDrawable(R.drawable.background_square)
+                squareViewSelected?.unSelectSquare()
                 squareViewSelected = v
-                squareViewSelected?.background = resources.getDrawable(R.drawable.background_square_selected)
+                squareViewSelected?.selectSquare()
                 onGridListener?.onClickSquare((v.tag as String).toInt())
             }
         }
@@ -49,19 +49,20 @@ class GridView : GridLayout {
         onGridListener = listener
     }
 
-    fun setValue(square: Int, solution : SquareData) {
-        listSquareView[square].setValue(solution)
-        squareViewSelected?.background = resources.getDrawable(R.drawable.background_square)
+    fun updateGrid(square: Int, solution: SquareData) {
+        listSquareView[square].updateSquare(solution)
+        squareViewSelected?.unSelectSquare()
+        squareViewSelected = null
     }
 
     fun unSelectedSquare() {
-        squareViewSelected?.background = resources.getDrawable(R.drawable.background_square)
+        squareViewSelected?.unSelectSquare()
+        squareViewSelected = null
     }
 
-    fun squareSelected(idSquare: Int, value : Int) {
+    fun selectSquare(idSquare: Int, value: Int) {
         squareViewSelected = listSquareView[idSquare]
-        squareViewSelected?.selectValue(value)
-        squareViewSelected?.background = resources.getDrawable(R.drawable.background_square_selected)
+        squareViewSelected?.selectSquare(value)
     }
 
     interface OnGridListener {

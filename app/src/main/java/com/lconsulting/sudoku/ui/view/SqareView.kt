@@ -1,6 +1,7 @@
 package com.lconsulting.sudoku.ui.view
 
 import android.content.Context
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -30,13 +31,15 @@ class SqareView : ConstraintLayout {
         }
     }
 
-    fun setValue(square: SquareData) {
+    fun updateSquare(square: SquareData) {
         if (square.value != 0) {
-            tvValue.text = square.value.toString()
-            tvValue.visibility = View.VISIBLE
-            tvValue.setTextColor(
-                resources.getColor(square.textColor)
-            )
+            tvValue.apply {
+                text = square.value.toString()
+                visibility = View.VISIBLE
+                setTextColor(
+                    resources.getColor(square.idTextColor)
+                )
+            }
             grid.visibility = View.INVISIBLE
         } else {
             tvValue.visibility = View.INVISIBLE
@@ -50,14 +53,25 @@ class SqareView : ConstraintLayout {
                 it.setTextColor(
                     resources.getColor(R.color.colorText)
                 )
+                it.setTypeface(it.typeface, Typeface.NORMAL)
             }
         }
     }
 
-    fun selectValue(value: Int) {
-        listSquareView[value - 1].setTextColor(
-            resources.getColor(R.color.colorValueFound)
-        )
+    fun selectSquare(value: Int) {
+        listSquareView[value - 1].apply {
+            setTextColor(resources.getColor(R.color.colorValueFound))
+            setTypeface(typeface, Typeface.BOLD)
+        }
+        selectSquare()
+    }
+
+    fun unSelectSquare() {
+        background = resources.getDrawable(R.drawable.background_square)
+    }
+
+    fun selectSquare() {
+        background = resources.getDrawable(R.drawable.background_square_selected)
     }
 
 }

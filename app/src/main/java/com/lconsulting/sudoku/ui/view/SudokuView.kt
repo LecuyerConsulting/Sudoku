@@ -44,25 +44,25 @@ class SudokuView : GridLayout {
         onSudokuListener = listener
     }
 
-    fun setValue(solution: Array<SquareData>) {
+    fun updateSudoku(solution: Array<SquareData>) {
         for (i in solution.indices) {
             val posLine = i / 9
             val posColumn = i % 9
             val square = (posColumn % 3) + (posLine % 3) * 3
             val grid = (posColumn / 3) + (posLine / 3) * 3
 
-            listGridView[grid].setValue(square, solution[i])
+            listGridView[grid].updateGrid(square, solution[i])
         }
     }
 
-    fun squareSelected(idGrid: Int, idSquare: Int, value : Int) {
+    fun selectSquare(idGrid: Int, idSquare: Int, value : Int) {
         gridViewSelected = listGridView[idGrid]
-        gridViewSelected?.squareSelected(idSquare, value)
+        gridViewSelected?.selectSquare(idSquare, value)
 
     }
 
     interface OnSudokuListener {
-        fun onClickSquare(grille: Int, position: Int)
+        fun onClickSquare(idGrid: Int, idSquare: Int)
     }
 
 }

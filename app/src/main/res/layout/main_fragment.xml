@@ -11,6 +11,7 @@
         android:id="@+id/tvState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/insert_a_value"
         app:layout_constraintBottom_toTopOf="@+id/sudoku"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
