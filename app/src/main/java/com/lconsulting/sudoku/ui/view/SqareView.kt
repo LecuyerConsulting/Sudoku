@@ -47,8 +47,17 @@ class SqareView : ConstraintLayout {
                 } else {
                     it.visibility = View.INVISIBLE
                 }
+                it.setTextColor(
+                    resources.getColor(R.color.colorText)
+                )
             }
         }
+    }
+
+    fun selectValue(value: Int) {
+        listSquareView[value - 1].setTextColor(
+            resources.getColor(R.color.colorValueFound)
+        )
     }
 
 }

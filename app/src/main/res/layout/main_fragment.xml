@@ -84,15 +84,15 @@
             android:text="9" />
     </GridLayout>
 
-    <LinearLayout
+    <GridLayout
         android:id="@+id/llAction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/llButton"
+        android:columnCount="3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llButton">
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:layout_width="wrap_content"
@@ -100,6 +100,7 @@
             android:src="@drawable/baseline_skip_previous_black_24" />
 
         <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/bPlay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_play_arrow_black_24" />
@@ -108,7 +109,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_skip_next_black_24" />
-    </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/bRepeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_gravity="center"
+            android:src="@drawable/baseline_repeat_black_24" />
+    </GridLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

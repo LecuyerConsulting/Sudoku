@@ -1,5 +1,6 @@
 package com.lconsulting.sudoku.ui.main
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.lconsulting.sudoku.R
@@ -9,10 +10,17 @@ import com.lconsulting.sudoku.ui.data.SquareData
 sealed class SudokuState {
     class FillSquareSudokuState(
         val solution: Array<SquareData>,
-        val idRessource: Int,
+        val idRes: Int,
         val value: Int
-    ) :
-        SudokuState()
+    ) : SudokuState()
+
+    class FillSquareAlgoSudokuState(
+        val solution: Array<SquareData>,
+        val idRes: Int,
+        val value: Int,
+        val idGrid: Int,
+        val idSquare: Int
+    ) : SudokuState()
 
     class DisplayButtonState(val possibility: MutableSet<Int>) : SudokuState()
     class ResetSudokuState(val solution: Array<SquareData>) : SudokuState()
@@ -33,6 +41,7 @@ class MainViewModel : ViewModel() {
 
     fun getNumberAvailable(g: Int, p: Int) {
         val pos = getPosition(g, p)
+
         val squareData = solution[pos]
         state.postValue(SudokuState.DisplayButtonState(squareData.possibility))
     }
@@ -63,12 +72,21 @@ class MainViewModel : ViewModel() {
 
     fun startAlgo() {
         if (!launchAlgo()) {
-            state.postValue(SudokuState.InsertValueSudokuState)
+            state.postValue(SudokuState.ErrorSudokuState)
         }
     }
 
     private fun launchAlgo(): Boolean {
         if (checkOneValueBySquare()) {
+            return true
+        }
+        if (checkOneValue9Time(
+                ::getPositionForGridBy9,
+                ::getPositionForGrid,
+                ::findPositionByGrid,
+                R.string.one_value_by_grid
+            )
+        ) {
             return true
         }
         if (checkOneValue9Time(
@@ -89,15 +107,6 @@ class MainViewModel : ViewModel() {
         ) {
             return true
         }
-        if (checkOneValue9Time(
-                ::getPositionForGridBy9,
-                ::getPositionForGrid,
-                ::findPositionByGrid,
-                R.string.one_value_by_grid
-            )
-        ) {
-            return true
-        }
         return false
     }
 
@@ -107,9 +116,9 @@ class MainViewModel : ViewModel() {
             it.textColor = textColor
         }
 
-        updateSolution(value, getIndiceForColumn(pos), ::getPositionForColumn, ::remove)
-        updateSolution(value, getIndiceForRow(pos), ::getPositionForRow, ::remove)
         updateSolution(value, getIndiceForGrid(pos), ::getPositionForGrid, ::remove)
+        updateSolution(value, getIndiceForRow(pos), ::getPositionForRow, ::remove)
+        updateSolution(value, getIndiceForColumn(pos), ::getPositionForColumn, ::remove)
     }
 
     private fun updateSolution(
@@ -140,11 +149,14 @@ class MainViewModel : ViewModel() {
             if (solution[i].value == 0 && solution[i].possibility.size == 1) {
                 val value = solution[i].possibility.toList()[0]
                 update(value, R.color.colorValueFound, i)
+
                 state.postValue(
-                    SudokuState.FillSquareSudokuState(
+                    SudokuState.FillSquareAlgoSudokuState(
                         solution,
                         R.string.one_value_by_square,
-                        value
+                        value,
+                        getIdGrid(i),
+                        getIdSquareInGrid(i)
                     )
                 )
                 return true
@@ -189,11 +201,16 @@ class MainViewModel : ViewModel() {
                 val value = i + 1
                 val position = findPosition(startIndice, value)
                 update(value, R.color.colorValueFound, position)
+
+                Log.d("tom971", "checkOneValue $position")
+
                 state.postValue(
-                    SudokuState.FillSquareSudokuState(
+                    SudokuState.FillSquareAlgoSudokuState(
                         solution,
                         idRessource,
-                        value
+                        value,
+                        getIdGrid(position),
+                        getIdSquareInGrid(position)
                     )
                 )
                 return true
@@ -206,7 +223,8 @@ class MainViewModel : ViewModel() {
     private fun findPositionByRow(startIndice: Int, value: Int): Int {
         for (i in 0 until 9) {
             var position = startIndice + i
-            if (solution[position].possibility.contains(value)) {
+            val squareData = solution[position]
+            if (squareData.value == 0 && squareData.possibility.contains(value)) {
                 return position
             }
         }
@@ -216,7 +234,8 @@ class MainViewModel : ViewModel() {
     private fun findPositionByColumn(startIndice: Int, value: Int): Int {
         for (i in 0 until 9) {
             var position = startIndice + i * 9
-            if (solution[position].possibility.contains(value)) {
+            val squareData = solution[position]
+            if (squareData.value == 0 && squareData.possibility.contains(value)) {
                 return position
             }
         }
@@ -226,7 +245,8 @@ class MainViewModel : ViewModel() {
     private fun findPositionByGrid(startIndice: Int, value: Int): Int {
         for (i in 0 until 9) {
             var position = startIndice + (i % 3) + ((i / 3) * 9)
-            if (solution[position].possibility.contains(value)) {
+            val squareData = solution[position]
+            if (squareData.value == 0 && squareData.possibility.contains(value)) {
                 return position
             }
         }
@@ -258,4 +278,17 @@ class MainViewModel : ViewModel() {
 
     private fun getPosition(g: Int, p: Int) =
         (3 * (g % 3) + (p % 3)) + (((p / 3) + (g / 3) * 3) * 9)
+
+    private fun getIdGrid(position: Int): Int {
+        val indiceGrid = getIndiceForGrid(position)
+
+        return ((indiceGrid % 9) / 3) + (indiceGrid / 9)
+    }
+
+    private fun getIdSquareInGrid(position: Int): Int {
+        val indiceRow = getIndiceForRow(position)
+        val indiceColumn = getIndiceForColumn(position)
+
+        return (((indiceRow / 9) % 3) * 3) + (indiceColumn % 3)
+    }
 }

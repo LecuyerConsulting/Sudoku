@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.*
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -23,11 +22,16 @@ class MainFragment : Fragment() {
 
     private var line: Int = 0
     private var position: Int = 0
+    private var isRepeat : Boolean = false
 
     private val onClickListener = View.OnClickListener { v ->
         when (v) {
             is TextView -> {
                 viewModel.checkValue(v.text.toString(), line, position)
+            }
+            else -> when (v.id) {
+                R.id.bPlay -> viewModel.startAlgo()
+                R.id.bRepeat -> isRepeat = !isRepeat
 
             }
         }
@@ -66,6 +70,9 @@ class MainFragment : Fragment() {
         llButton.forEach {
             it.setOnClickListener(onClickListener)
         }
+        llAction.forEach {
+            it.setOnClickListener(onClickListener)
+        }
 
         sudoku.setOnSudokuListener(onSudokuListener)
     }
@@ -85,10 +92,17 @@ class MainFragment : Fragment() {
         when (state) {
             is SudokuState.FillSquareSudokuState -> {
                 sudoku.setValue(state.solution)
-                tvState.text = resources.getString(state.idRessource, state.value)
-//                Handler().postDelayed({
-//                    viewModel.startAlgo()
-//                }, 5000)
+                tvState.text = resources.getString(state.idRes, state.value)
+            }
+            is SudokuState.FillSquareAlgoSudokuState -> {
+                tvState.text = resources.getString(state.idRes, state.value)
+                sudoku.squareSelected(state.idGrid ,state.idSquare, state.value)
+                Handler().postDelayed({
+                    sudoku.setValue(state.solution)
+                    if (isRepeat){
+                        viewModel.startAlgo()
+                    }
+                }, 500)
             }
             is SudokuState.ResetSudokuState ->{
                 sudoku.setValue(state.solution)
@@ -98,12 +112,7 @@ class MainFragment : Fragment() {
                 tvState.text = resources.getString(R.string.insert_a_value)
             }
             is SudokuState.ErrorSudokuState -> {
-                tvState.text = resources.getString(R.string.insert_a_value)
-                Toast.makeText(
-                    requireContext(),
-                    "valeur impossible",
-                    Toast.LENGTH_SHORT
-                ).show()
+                tvState.text = resources.getString(R.string.error_sudoku)
             }
             is SudokuState.DisplayButtonState -> refreshButtonNumber(state.possibility)
         }

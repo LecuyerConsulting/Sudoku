@@ -55,6 +55,12 @@ class SudokuView : GridLayout {
         }
     }
 
+    fun squareSelected(idGrid: Int, idSquare: Int, value : Int) {
+        gridViewSelected = listGridView[idGrid]
+        gridViewSelected?.squareSelected(idSquare, value)
+
+    }
+
     interface OnSudokuListener {
         fun onClickSquare(grille: Int, position: Int)
     }

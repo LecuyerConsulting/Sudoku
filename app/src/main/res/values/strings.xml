@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">Sudoku</string>
-    <string name="insert_value">Insère la valeur %1$d</string>
-    <string name="insert_a_value">Insérez une valeur</string>
-    <string name="one_value_by_square">Insère la valeur %1$d car seule valeur disponible dans la cellule</string>
-    <string name="one_value_by_row">Insère la valeur %1$d car seule valeur dans la ligne disponible</string>
-    <string name="one_value_by_column">Insère la valeur %1$d car seule valeur dans la colonne disponible</string>
-    <string name="one_value_by_grid">Insère la valeur %1$d car seule valeur dans la grille disponible</string>
+    <string name="insert_value">Insère la valeur %1$d\n</string>
+    <string name="insert_a_value">Insérez une valeur\n</string>
+    <string name="one_value_by_square">Insère la valeur %1$d\ncar seule valeur disponible dans la cellule</string>
+    <string name="one_value_by_row">Insère la valeur %1$d \ncar seule valeur dans la ligne disponible</string>
+    <string name="one_value_by_column">Insère la valeur %1$d\ncar seule valeur dans la colonne disponible</string>
+    <string name="one_value_by_grid">Insère la valeur %1$d\ncar seule valeur dans la grille disponible</string>
+    <string name="error_sudoku">Aucune proposition trouvée.\nInsérez une valeur</string>
 </resources>

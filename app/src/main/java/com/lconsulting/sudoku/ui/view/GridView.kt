@@ -58,6 +58,12 @@ class GridView : GridLayout {
         squareViewSelected?.background = resources.getDrawable(R.drawable.background_square)
     }
 
+    fun squareSelected(idSquare: Int, value : Int) {
+        squareViewSelected = listSquareView[idSquare]
+        squareViewSelected?.selectValue(value)
+        squareViewSelected?.background = resources.getDrawable(R.drawable.background_square_selected)
+    }
+
     interface OnGridListener {
         fun onClickSquare(position: Int)
     }
