@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.*
 import android.widget.TextView
+import androidx.annotation.IntDef
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -15,10 +16,21 @@ import kotlinx.android.synthetic.main.main_fragment.*
 class MainFragment : Fragment() {
 
     companion object {
+
+        @IntDef(PLAY, STOP)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class StateResolver
+
+        const val PLAY = 0
+        const val STOP = 1
+
         fun newInstance() = MainFragment()
     }
 
     private lateinit var viewModel: SudokuViewModel
+
+    @StateResolver
+    private var statePlayer = PLAY
 
     private var idGrid: Int = 0
     private var idSquare: Int = 0
@@ -31,9 +43,21 @@ class MainFragment : Fragment() {
                 disableDigitsButton()
             }
             else -> when (v.id) {
-                R.id.bPlay -> viewModel.startAlgo()
-                R.id.bRepeat -> isRepeat = !isRepeat
-
+                R.id.btnPlay -> {
+                    if(statePlayer == STOP){
+                        btnPlay.setImageDrawable(resources.getDrawable(R.drawable.baseline_play_arrow_black_24))
+                        statePlayer = PLAY
+                        isRepeat = false
+                    }else {
+                        viewModel.startAlgo()
+                    }
+                }
+                R.id.btnRepeat -> {
+                    statePlayer = STOP
+                    btnPlay.setImageDrawable(resources.getDrawable(R.drawable.baseline_stop_black_24))
+                    isRepeat = true
+                    viewModel.startAlgo()
+                }
             }
         }
     }
@@ -77,6 +101,7 @@ class MainFragment : Fragment() {
         sudoku.setOnSudokuListener(onSudokuListener)
 
         disableDigitsButton()
+        disableActionButton()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -104,7 +129,7 @@ class MainFragment : Fragment() {
                     if (isRepeat){
                         viewModel.startAlgo()
                     }
-                }, 2500)
+                }, 1000)
             }
             is SudokuState.Reset ->{
                 sudoku.updateSudoku(state.solution)
@@ -125,6 +150,11 @@ class MainFragment : Fragment() {
             val tv = it as TextView
             tv.isEnabled = false
         }
+    }
+
+    private fun disableActionButton() {
+        btnPrevious.isEnabled  = false
+        btnNext.isEnabled = false
     }
 
     private fun updateDigitsButton(possibility: MutableSet<Int>) {
