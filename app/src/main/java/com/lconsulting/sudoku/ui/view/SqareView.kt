@@ -3,6 +3,7 @@ package com.lconsulting.sudoku.ui.view
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
@@ -40,6 +41,7 @@ class SqareView : ConstraintLayout {
                     resources.getColor(square.idTextColor)
                 )
             }
+            setTextViewUI(listSquareView[square.value - 1], R.color.colorText, Typeface.NORMAL)
             grid.visibility = View.INVISIBLE
         } else {
             tvValue.visibility = View.INVISIBLE
@@ -50,19 +52,12 @@ class SqareView : ConstraintLayout {
                 } else {
                     it.visibility = View.INVISIBLE
                 }
-                it.setTextColor(
-                    resources.getColor(R.color.colorText)
-                )
-                it.setTypeface(it.typeface, Typeface.NORMAL)
             }
         }
     }
 
     fun selectSquare(value: Int) {
-        listSquareView[value - 1].apply {
-            setTextColor(resources.getColor(R.color.colorValueFound))
-            setTypeface(typeface, Typeface.BOLD)
-        }
+        setTextViewUI(listSquareView[value - 1], R.color.colorValueFound, Typeface.BOLD)
         selectSquare()
     }
 
@@ -72,6 +67,13 @@ class SqareView : ConstraintLayout {
 
     fun selectSquare() {
         background = resources.getDrawable(R.drawable.background_square_selected)
+    }
+
+    private fun setTextViewUI(tv : TextView, idResColor : Int, idTypeface: Int){
+        tv.apply {
+            setTextColor(resources.getColor(idResColor))
+            setTypeface(null, idTypeface)
+        }
     }
 
 }
