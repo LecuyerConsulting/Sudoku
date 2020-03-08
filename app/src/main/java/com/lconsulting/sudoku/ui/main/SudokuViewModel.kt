@@ -6,7 +6,6 @@ import com.lconsulting.sudoku.R
 import com.lconsulting.sudoku.ui.data.SquareData
 
 
-
 sealed class SudokuState {
     class FillSquare(
         val sudoku: Array<SquareData>, val idRes: Int, val value: Int
@@ -23,7 +22,7 @@ sealed class SudokuState {
     class DisplayButton(val possibility: MutableSet<Int>) : SudokuState()
     class Reset(val solution: Array<SquareData>) : SudokuState()
     object InsertValue : SudokuState()
-    object Error : SudokuState()
+    class DisplayMessage(val idResString: Int) : SudokuState()
 }
 
 /**
@@ -50,19 +49,22 @@ class SudokuViewModel : ViewModel() {
 
     val state = MutableLiveData<SudokuState>()
 
+    private var digitsToFind = 81
+
     private var sudoku: Array<SquareData> = Array(81) { SquareData() }
 
     /**
      * reset sudoku to default values
      */
     fun reset() {
+        digitsToFind = 81
         sudoku = Array(81) { SquareData() }
         state.postValue(SudokuState.Reset(sudoku))
     }
 
     /**
      * get digits available for the selected square
-     * 
+     *
      * @param idGrid toto
      * @param idSquare tata
      */
@@ -92,6 +94,7 @@ class SudokuViewModel : ViewModel() {
             updateDigitsAvailable(oldValue, getStartIndexRow(pos), ::getIndexForRow, ::add)
             updateDigitsAvailable(oldValue, getStartIndexGrid(pos), ::getIndexForGrid, ::add)
             sudoku[pos].value = 0
+            digitsToFind++
         }
 
         insertValue(newValue, R.color.colorValue, pos)
@@ -106,8 +109,10 @@ class SudokuViewModel : ViewModel() {
     }
 
     fun startAlgo() {
-        if (!searchValue()) {
-            state.postValue(SudokuState.Error)
+        if(digitsToFind == 0){
+            state.postValue(SudokuState.DisplayMessage(R.string.succes_sudoku))
+        }else if (!searchValue()) {
+            state.postValue(SudokuState.DisplayMessage(R.string.error_sudoku))
         }
     }
 
@@ -154,7 +159,7 @@ class SudokuViewModel : ViewModel() {
      * insert value in sudoku
      * and update other squares in the same row, column and grid
      *
-     * @param value value to put in the square 
+     * @param value value to put in the square
      * @param idTextColor id ressource for textColor
      * @param index square index who will get the value
      */
@@ -163,7 +168,7 @@ class SudokuViewModel : ViewModel() {
             this.value = value
             this.idTextColor = idTextColor
         }
-
+        digitsToFind--
         updateDigitsAvailable(value, getStartIndexGrid(index), ::getIndexForGrid, ::remove)
         updateDigitsAvailable(value, getStartIndexRow(index), ::getIndexForRow, ::remove)
         updateDigitsAvailable(value, getStartIndexColumn(index), ::getIndexForColumn, ::remove)

@@ -129,7 +129,7 @@ class MainFragment : Fragment() {
                     if (isRepeat){
                         viewModel.startAlgo()
                     }
-                }, 1000)
+                }, 500)
             }
             is SudokuState.Reset ->{
                 sudoku.updateSudoku(state.solution)
@@ -138,8 +138,8 @@ class MainFragment : Fragment() {
             is SudokuState.InsertValue -> {
                 tvState.text = resources.getString(R.string.insert_a_value)
             }
-            is SudokuState.Error -> {
-                tvState.text = resources.getString(R.string.error_sudoku)
+            is SudokuState.DisplayMessage -> {
+                tvState.text = resources.getString(state.idResString)
             }
             is SudokuState.DisplayButton -> updateDigitsButton(state.possibility)
         }

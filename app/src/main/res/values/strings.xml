@@ -8,4 +8,5 @@
     <string name="one_value_by_column">Insère la valeur %1$d\ncar seule valeur dans la colonne disponible</string>
     <string name="one_value_by_grid">Insère la valeur %1$d\ncar seule valeur dans la grille disponible</string>
     <string name="error_sudoku">Aucune proposition trouvée.\nInsérez une valeur</string>
+    <string name="success_sudoku">Sudoku résolu.\n</string>
 </resources>
