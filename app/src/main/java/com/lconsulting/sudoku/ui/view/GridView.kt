@@ -7,7 +7,7 @@ import android.view.View.OnClickListener
 import android.widget.GridLayout
 import androidx.core.view.forEach
 import com.lconsulting.sudoku.R
-import com.lconsulting.sudoku.ui.data.SquareData
+import com.lconsulting.sudoku.data.SquareData
 
 class GridView : GridLayout {
 

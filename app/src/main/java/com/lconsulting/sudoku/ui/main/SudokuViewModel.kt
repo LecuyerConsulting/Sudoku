@@ -3,7 +3,7 @@ package com.lconsulting.sudoku.ui.main
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.lconsulting.sudoku.R
-import com.lconsulting.sudoku.ui.data.SquareData
+import com.lconsulting.sudoku.data.SquareData
 
 
 sealed class SudokuState {
@@ -45,7 +45,7 @@ sealed class SudokuState {
  *
  */
 
-class SudokuViewModel : ViewModel() {
+open class SudokuViewModel : ViewModel() {
 
     val state = MutableLiveData<SudokuState>()
 

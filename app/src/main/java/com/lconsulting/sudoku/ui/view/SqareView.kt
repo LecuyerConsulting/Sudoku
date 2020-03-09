@@ -3,14 +3,13 @@ package com.lconsulting.sudoku.ui.view
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
 import com.lconsulting.sudoku.R
-import com.lconsulting.sudoku.ui.data.SquareData
+import com.lconsulting.sudoku.data.SquareData
 import kotlinx.android.synthetic.main.view_square.view.*
 
 class SqareView : ConstraintLayout {

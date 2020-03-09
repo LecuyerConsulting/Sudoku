@@ -1,4 +1,4 @@
-package com.lconsulting.sudoku.ui.data
+package com.lconsulting.sudoku.data
 
 import com.lconsulting.sudoku.R
 
