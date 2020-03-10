@@ -31,10 +31,11 @@ class SudokuView : GridLayout {
             listGridView.add(grid)
             grid.setOnGridListener(object : GridView.OnGridListener {
                 override fun onClickSquare(position: Int) {
-                    if (listGridViewSelected.isNotEmpty()) {
-                        listGridViewSelected.forEach { gridSelected ->
-                            gridSelected.unSelectedSquare()
+                    if (!listGridViewSelected.contains(grid)) {
+                        listGridViewSelected.forEach { gridViewSelected ->
+                            gridViewSelected.unSelectedSquare()
                         }
+                        listGridViewSelected.clear()
                     }
                     listGridViewSelected.add(grid)
                     onSudokuListener?.onClickSquare(grid.tag.toString().toInt(), position)
