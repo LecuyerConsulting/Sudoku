@@ -7,6 +7,7 @@
     <string name="one_value_by_row">Insère la valeur %1$d \ncar seule valeur dans la ligne disponible</string>
     <string name="one_value_by_column">Insère la valeur %1$d\ncar seule valeur dans la colonne disponible</string>
     <string name="one_value_by_grid">Insère la valeur %1$d\ncar seule valeur dans la grille disponible</string>
+    <string name="pair_found_grid">(%1$d,%2$d) uniquement disponible dans les 2 cellules pour cette grille\ndonc on les supprime des autres cellules de la meme grille</string>
     <string name="error_sudoku">Aucune proposition trouvée.\nInsérez une valeur</string>
     <string name="success_sudoku">Sudoku résolu.\n</string>
 </resources>

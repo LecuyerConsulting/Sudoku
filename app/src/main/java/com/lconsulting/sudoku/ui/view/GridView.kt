@@ -12,16 +12,15 @@ import com.lconsulting.sudoku.data.SquareData
 class GridView : GridLayout {
 
     private var onGridListener: OnGridListener? = null
-
-    private var squareViewSelected: SqareView? = null
     private val listSquareView: MutableList<SqareView> = mutableListOf()
+    private val listSquareViewSelected: MutableList<SqareView> = mutableListOf()
 
     private val onClickListener = OnClickListener { v ->
         when (v) {
             is SqareView -> {
-                squareViewSelected?.unSelectSquare()
-                squareViewSelected = v
-                squareViewSelected?.selectSquare()
+                unSelectedSquare()
+                listSquareViewSelected.add(v)
+                v.selectSquare()
                 onGridListener?.onClickSquare((v.tag as String).toInt())
             }
         }
@@ -51,18 +50,27 @@ class GridView : GridLayout {
 
     fun updateGrid(square: Int, solution: SquareData) {
         listSquareView[square].updateSquare(solution)
-        squareViewSelected?.unSelectSquare()
-        squareViewSelected = null
+        unSelectedSquare()
     }
 
     fun unSelectedSquare() {
-        squareViewSelected?.unSelectSquare()
-        squareViewSelected = null
+        listSquareViewSelected.forEach {
+            it.unSelectSquare()
+        }
+        listSquareViewSelected.clear()
     }
 
     fun selectSquare(idSquare: Int, value: Int) {
-        squareViewSelected = listSquareView[idSquare]
-        squareViewSelected?.selectSquare(value)
+        val square = listSquareView[idSquare]
+        listSquareViewSelected.add(square)
+        square.selectSquare(value)
+    }
+
+    fun selectSquare(idSquare: Int, listValueSelected: Set<Int>) {
+        val square = listSquareView[idSquare]
+        listSquareViewSelected.add(square)
+        square.selectSquare(listValueSelected)
+
     }
 
     interface OnGridListener {

@@ -100,6 +100,37 @@ class MainFragment : Fragment() {
         hideActionButton()
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.insertValueByUser("7",0, 3)
+        viewModel.insertValueByUser("8", 0, 5)
+        viewModel.insertValueByUser("5", 0, 8)
+        viewModel.insertValueByUser("3", 1, 0)
+        viewModel.insertValueByUser("1", 1, 5)
+        viewModel.insertValueByUser("1", 2, 1)
+        viewModel.insertValueByUser("5", 2, 3)
+        viewModel.insertValueByUser("3", 2,4)
+        viewModel.insertValueByUser("2", 2, 6)
+        viewModel.insertValueByUser("8", 3, 0)
+        viewModel.insertValueByUser("6", 3, 1)
+        viewModel.insertValueByUser("3", 3, 5)
+        viewModel.insertValueByUser("5", 4, 8)
+        viewModel.insertValueByUser("2", 5, 1)
+        viewModel.insertValueByUser("6", 5, 5)
+        viewModel.insertValueByUser("9", 5, 8)
+        viewModel.insertValueByUser("7", 6, 2)
+        viewModel.insertValueByUser("4", 6, 4)
+        viewModel.insertValueByUser("9", 7, 2)
+        viewModel.insertValueByUser("8", 7, 3)
+        viewModel.insertValueByUser("3", 7, 8)
+        viewModel.insertValueByUser("5", 8, 4)
+        viewModel.insertValueByUser("2", 8, 5)
+        viewModel.insertValueByUser("4", 8, 6)
+        isRepeat = true
+        viewModel.startAlgo()
+
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_main, menu)
     }
@@ -125,7 +156,7 @@ class MainFragment : Fragment() {
                     if (isRepeat) {
                         viewModel.startAlgo()
                     }
-                }, 500)
+                }, 250)
             }
             is SudokuState.Reset -> {
                 sudoku.updateSudoku(state.solution)
@@ -139,6 +170,18 @@ class MainFragment : Fragment() {
                 tvState.text = resources.getString(state.idResString)
             }
             is SudokuState.DisplayButton -> updateDigitsButton(state.possibility)
+            is SudokuState.PairAlgo -> {
+                sudoku.selectSquares(state.listSquareSelected, state.listValueSelected)
+                val listValues = state.listValueSelected.toList()
+                tvState.text = resources.getString(state.idRes, listValues[0], listValues[1])
+                Handler().postDelayed({
+                    sudoku.updateSudoku(state.sudoku)
+                    if (isRepeat) {
+                        viewModel.startAlgo()
+                    }
+                }, 250)
+
+            }
         }
     }
 
