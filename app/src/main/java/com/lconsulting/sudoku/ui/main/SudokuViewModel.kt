@@ -1,6 +1,5 @@
 package com.lconsulting.sudoku.ui.main
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.lconsulting.sudoku.R
@@ -375,8 +374,15 @@ open class SudokuViewModel : ViewModel() {
         for (i in sudoku.indices) {
             val square = sudoku[i]
             if (square.possibility.size == 2) {
-                Log.d("tom971", "Pair trouvé index $i")
-                return checkPairByGrid(i)
+                if(checkPairByGrid(i)){
+                    return true
+                }
+                if(checkPairBy(i, getStartIndexRow(i), ::getIndexForRow)) {
+                    return true
+                }
+                if(checkPairBy(i, getStartIndexColumn(i), ::getIndexForColumn)) {
+                    return true
+                }
             }
         }
         return false
@@ -386,10 +392,10 @@ open class SudokuViewModel : ViewModel() {
         val startIndexGrid = getStartIndexGrid(indexPair)
         var setIndex = mutableSetOf<Int>()
 
-        setIndex.addAll(getSquaresContainsPair(startIndexGrid, indexPair, ::containsOnlyPair))
+        setIndex.addAll(getSquaresContainsPair(startIndexGrid, indexPair, ::getIndexForGrid, ::containsOnlyPair))
 
         if (setIndex.isEmpty()) {
-            setIndex.addAll(getSquaresContainsPair(startIndexGrid, indexPair, ::containsPair))
+            setIndex.addAll(getSquaresContainsPair(startIndexGrid, indexPair, ::getIndexForGrid, ::containsPair))
         }
 
         if (setIndex.size == 1) {
@@ -422,27 +428,53 @@ open class SudokuViewModel : ViewModel() {
                 )
             }
 
-            val listSquareSelected = ArrayList<Pair<Int, Int>>()
-            listSquareSelected.add(Pair(getIndexGrid(indexPair), getIndexSquareInGrid(indexPair)))
-            listSquareSelected.add(
-                Pair(
-                    getIndexGrid(indexOtherPair),
-                    getIndexSquareInGrid(indexOtherPair)
-                )
-            )
-
-            state.postValue(
-                SudokuState.PairAlgo(
-                    sudoku,
-                    R.string.pair_found_grid,
-                    listSquareSelected,
-                    sudoku[indexPair].possibility
-                )
-            )
+            postValuePair(indexPair, indexOtherPair)
 
             return true
         }
         return false
+    }
+
+    private fun checkPairBy(indexPair: Int, startIndex : Int, getIndexFor: (start: Int, index: Int) -> Int) : Boolean {
+        var setIndex = mutableSetOf<Int>()
+
+        setIndex.addAll(getSquaresContainsPair(startIndex, indexPair, getIndexFor, ::containsOnlyPair))
+
+        if (setIndex.size == 1) {
+            val indexOtherPair = setIndex.toList()[0]
+
+            updateDigitsAvailableForPair(
+                startIndex,
+                indexPair,
+                indexOtherPair,
+                getIndexFor
+            )
+
+            postValuePair(indexPair, indexOtherPair)
+
+        }
+
+        return false
+    }
+
+    private fun postValuePair(indexPair : Int, indexOtherPair : Int){
+        val listSquareSelected = ArrayList<Pair<Int, Int>>()
+        listSquareSelected.add(Pair(getIndexGrid(indexPair), getIndexSquareInGrid(indexPair)))
+        listSquareSelected.add(
+            Pair(
+                getIndexGrid(indexOtherPair),
+                getIndexSquareInGrid(indexOtherPair)
+            )
+        )
+
+        state.postValue(
+            SudokuState.PairAlgo(
+                sudoku,
+                R.string.pair_found_grid,
+                listSquareSelected,
+                sudoku[indexPair].possibility
+            )
+        )
     }
 
     private fun updateDigitsAvailableForPair(startIndex: Int, indexPair: Int, indexOtherPair: Int,
@@ -458,14 +490,15 @@ open class SudokuViewModel : ViewModel() {
     }
 
     private fun getSquaresContainsPair(
-        startIndexGrid: Int,
+        startIndex: Int,
         indexPair: Int,
+        getIndexFor: (start: Int, index: Int) -> Int,
         contains: (Set<Int>, Set<Int>) -> Boolean
     ):
             MutableSet<Int> {
         var setIndex = mutableSetOf<Int>()
         for (i in 0 until 9) {
-            val index = getIndexForGrid(startIndexGrid, i)
+            val index = getIndexFor(startIndex, i)
             if (indexPair != index) {
                 if (contains(sudoku[index].possibility, sudoku[indexPair].possibility)) {
                     setIndex.add(index)
