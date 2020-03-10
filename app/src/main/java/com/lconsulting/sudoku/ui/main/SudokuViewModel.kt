@@ -373,14 +373,14 @@ open class SudokuViewModel : ViewModel() {
     private fun checkPair(): Boolean {
         for (i in sudoku.indices) {
             val square = sudoku[i]
-            if (square.possibility.size == 2) {
-                if(checkPairByGrid(i)){
+            if (square.value == 0 && square.possibility.size == 2) {
+                if (checkPairByGrid(i)) {
                     return true
                 }
-                if(checkPairBy(i, getStartIndexRow(i), ::getIndexForRow)) {
+                if (checkPairBy(i, getStartIndexRow(i), ::getIndexForRow)) {
                     return true
                 }
-                if(checkPairBy(i, getStartIndexColumn(i), ::getIndexForColumn)) {
+                if (checkPairBy(i, getStartIndexColumn(i), ::getIndexForColumn)) {
                     return true
                 }
             }
@@ -392,16 +392,23 @@ open class SudokuViewModel : ViewModel() {
         val startIndexGrid = getStartIndexGrid(indexPair)
         var setIndex = mutableSetOf<Int>()
 
-        setIndex.addAll(getSquaresContainsPair(startIndexGrid, indexPair, ::getIndexForGrid, ::containsOnlyPair))
+        setIndex.addAll(
+            getSquaresContainsPair(
+                startIndexGrid,
+                indexPair,
+                ::getIndexForGrid,
+                ::containsOnlyPair
+            )
+        )
 
-        if (setIndex.isEmpty()) {
-            setIndex.addAll(getSquaresContainsPair(startIndexGrid, indexPair, ::getIndexForGrid, ::containsPair))
-        }
+//        if (setIndex.isEmpty()) {
+//            setIndex.addAll(getSquaresContainsPair(startIndexGrid, indexPair, ::getIndexForGrid, ::containsPair))
+//        }
 
         if (setIndex.size == 1) {
             val indexOtherPair = setIndex.toList()[0]
 
-            updateDigitsAvailableForPair(
+            var isModificationGrid = updateDigitsAvailableForPair(
                 startIndexGrid,
                 indexPair,
                 indexOtherPair,
@@ -428,36 +435,53 @@ open class SudokuViewModel : ViewModel() {
                 )
             }
 
-            postValuePair(indexPair, indexOtherPair)
-
-            return true
+            return if (isModificationGrid) {
+                postValuePair(indexPair, indexOtherPair)
+                true
+            } else {
+                false
+            }
         }
         return false
     }
 
-    private fun checkPairBy(indexPair: Int, startIndex : Int, getIndexFor: (start: Int, index: Int) -> Int) : Boolean {
+    private fun checkPairBy(
+        indexPair: Int,
+        startIndex: Int,
+        getIndexFor: (start: Int, index: Int) -> Int
+    ): Boolean {
         var setIndex = mutableSetOf<Int>()
 
-        setIndex.addAll(getSquaresContainsPair(startIndex, indexPair, getIndexFor, ::containsOnlyPair))
+        setIndex.addAll(
+            getSquaresContainsPair(
+                startIndex,
+                indexPair,
+                getIndexFor,
+                ::containsOnlyPair
+            )
+        )
 
         if (setIndex.size == 1) {
             val indexOtherPair = setIndex.toList()[0]
 
-            updateDigitsAvailableForPair(
+            var isModification = updateDigitsAvailableForPair(
                 startIndex,
                 indexPair,
                 indexOtherPair,
                 getIndexFor
             )
-
-            postValuePair(indexPair, indexOtherPair)
+            return if (isModification) {
+                postValuePair(indexPair, indexOtherPair)
+                true
+            } else {
+                false
+            }
 
         }
-
         return false
     }
 
-    private fun postValuePair(indexPair : Int, indexOtherPair : Int){
+    private fun postValuePair(indexPair: Int, indexOtherPair: Int) {
         val listSquareSelected = ArrayList<Pair<Int, Int>>()
         listSquareSelected.add(Pair(getIndexGrid(indexPair), getIndexSquareInGrid(indexPair)))
         listSquareSelected.add(
@@ -477,16 +501,23 @@ open class SudokuViewModel : ViewModel() {
         )
     }
 
-    private fun updateDigitsAvailableForPair(startIndex: Int, indexPair: Int, indexOtherPair: Int,
-                                             getIndexFor: (start: Int, index: Int) -> Int) {
+    private fun updateDigitsAvailableForPair(
+        startIndex: Int, indexPair: Int, indexOtherPair: Int,
+        getIndexFor: (start: Int, index: Int) -> Int
+    ): Boolean {
+        var isModification = false
         for (i in 0 until 9) {
             val index = getIndexFor(startIndex, i)
-            if (index == indexOtherPair) {
-                removeValueNotPair(index, indexPair)
-            } else if (indexPair != index) {
-                removeValuePair(index, indexPair)
+
+            var result = false
+            if (sudoku[index].value == 0 && index != indexPair && index != indexOtherPair) {
+                result = removeValuePair(index, indexPair)
+            }
+            if (result) {
+                isModification = true
             }
         }
+        return isModification
     }
 
     private fun getSquaresContainsPair(
@@ -511,23 +542,8 @@ open class SudokuViewModel : ViewModel() {
     private fun containsOnlyPair(setPossibility: Set<Int>, setPossibilityPair: Set<Int>) =
         setPossibility.size == 2 && setPossibility.containsAll(setPossibilityPair)
 
-    private fun containsPair(setPossibility: Set<Int>, setPossibilityPair: Set<Int>) =
-        setPossibility.containsAll(setPossibilityPair)
-
-    private fun removeValueNotPair(index: Int, indexPair: Int) {
-        val setPossibility = sudoku[index].possibility
-        val setPossibilityPair = sudoku[indexPair].possibility
-        val listValue: List<Int> = setPossibility.toList()
-        listValue.forEach {
-            if (!setPossibilityPair.contains(it)) {
-                setPossibility.remove(it)
-            }
-        }
-
-    }
-
-    private fun removeValuePair(index: Int, indexPair: Int) {
-        sudoku[index].possibility.removeAll(sudoku[indexPair].possibility)
+    private fun removeValuePair(index: Int, indexPair: Int): Boolean {
+        return sudoku[index].possibility.removeAll(sudoku[indexPair].possibility)
     }
 
     /**

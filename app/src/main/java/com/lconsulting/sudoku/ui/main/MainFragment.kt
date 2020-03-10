@@ -2,6 +2,7 @@ package com.lconsulting.sudoku.ui.main
 
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.annotation.IntDef
@@ -102,35 +103,72 @@ class MainFragment : Fragment() {
         hideActionButton()
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//        viewModel.insertValueByUser("7",0, 3)
-//        viewModel.insertValueByUser("8", 0, 5)
-//        viewModel.insertValueByUser("5", 0, 8)
-//        viewModel.insertValueByUser("3", 1, 0)
-//        viewModel.insertValueByUser("1", 1, 5)
-//        viewModel.insertValueByUser("1", 2, 1)
-//        viewModel.insertValueByUser("5", 2, 3)
-//        viewModel.insertValueByUser("3", 2,4)
-//        viewModel.insertValueByUser("2", 2, 6)
-//        viewModel.insertValueByUser("8", 3, 0)
-//        viewModel.insertValueByUser("6", 3, 1)
-//        viewModel.insertValueByUser("3", 3, 5)
-//        viewModel.insertValueByUser("5", 4, 8)
-//        viewModel.insertValueByUser("2", 5, 1)
-//        viewModel.insertValueByUser("6", 5, 5)
-//        viewModel.insertValueByUser("9", 5, 8)
-//        viewModel.insertValueByUser("7", 6, 2)
-//        viewModel.insertValueByUser("4", 6, 4)
-//        viewModel.insertValueByUser("9", 7, 2)
-//        viewModel.insertValueByUser("8", 7, 3)
-//        viewModel.insertValueByUser("3", 7, 8)
-//        viewModel.insertValueByUser("5", 8, 4)
-//        viewModel.insertValueByUser("2", 8, 5)
-//        viewModel.insertValueByUser("4", 8, 6)
+    override fun onStart() {
+        super.onStart()
+//        viewModel.insertValueByUser("4",0, 1)
+//        viewModel.insertValueByUser("2",0, 2)
+//        viewModel.insertValueByUser("8",0, 3)
+//        viewModel.insertValueByUser("1",0, 4)
+//        viewModel.insertValueByUser("6",0, 5)
+//        viewModel.insertValueByUser("3",0, 7)
+//        viewModel.insertValueByUser("5",0, 8)
+//
+//        viewModel.insertValueByUser("5",1, 2)
+//        viewModel.insertValueByUser("4",1, 4)
+//        viewModel.insertValueByUser("7",1, 5)
+//        viewModel.insertValueByUser("2",1, 7)
+//
+//        viewModel.insertValueByUser("6",2, 1)
+//        viewModel.insertValueByUser("5",2, 3)
+//        viewModel.insertValueByUser("2",2, 4)
+//        viewModel.insertValueByUser("4",2, 6)
+//
+//        viewModel.insertValueByUser("6",3, 0)
+//        viewModel.insertValueByUser("7",3, 1)
+//        viewModel.insertValueByUser("3",3, 2)
+//        viewModel.insertValueByUser("1",3, 3)
+//        viewModel.insertValueByUser("2",3, 4)
+//        viewModel.insertValueByUser("8",3, 5)
+//        viewModel.insertValueByUser("5",3, 6)
+//        viewModel.insertValueByUser("9",3, 7)
+//        viewModel.insertValueByUser("4",3, 8)
+//
+//        viewModel.insertValueByUser("5",4, 0)
+//        viewModel.insertValueByUser("4",4, 3)
+//        viewModel.insertValueByUser("3",4, 4)
+//
+//        viewModel.insertValueByUser("2",5, 0)
+//        viewModel.insertValueByUser("4",5, 2)
+//        viewModel.insertValueByUser("5",5, 4)
+//        viewModel.insertValueByUser("3",5, 7)
+//
+//        viewModel.insertValueByUser("2",6, 0)
+//        viewModel.insertValueByUser("6",6, 1)
+//        viewModel.insertValueByUser("1",6, 2)
+//        viewModel.insertValueByUser("4",6, 3)
+//        viewModel.insertValueByUser("5",6, 4)
+//        viewModel.insertValueByUser("7",6, 5)
+//        viewModel.insertValueByUser("3",6, 6)
+//        viewModel.insertValueByUser("8",6, 7)
+//        viewModel.insertValueByUser("9",6, 8)
+//
+//        viewModel.insertValueByUser("3",7, 2)
+//        viewModel.insertValueByUser("1",7, 6)
+//        viewModel.insertValueByUser("5",7, 7)
+//        viewModel.insertValueByUser("4",7, 8)
+//
+//        viewModel.insertValueByUser("8",8, 0)
+//        viewModel.insertValueByUser("4",8, 1)
+//        viewModel.insertValueByUser("5",8, 2)
+//        viewModel.insertValueByUser("3",8, 3)
+//        viewModel.insertValueByUser("9",8, 4)
+//        viewModel.insertValueByUser("1",8, 5)
+//        viewModel.insertValueByUser("6",8, 6)
+//        viewModel.insertValueByUser("7",8, 7)
+//        viewModel.insertValueByUser("2",8, 8)
 //        isRepeat = true
 //        viewModel.startAlgo()
-//    }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_main, menu)
@@ -182,7 +220,7 @@ class MainFragment : Fragment() {
             if (isRepeat) {
                 viewModel.startAlgo()
             }
-        }, 250)
+        }, 500)
     }
 
     private fun setRepeatMode(@StateResolver state: Int, idResDrawable: Int, isRepeat: Boolean) {
