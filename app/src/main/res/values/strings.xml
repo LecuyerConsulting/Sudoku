@@ -9,5 +9,7 @@
     <string name="one_value_by_grid">Insère la valeur %1$d\ncar seule valeur dans la grille disponible</string>
     <string name="pair_found_grid">(%1$d,%2$d) uniquement disponible dans les 2 cellules pour cette grille\ndonc on les supprime des autres cellules de la meme grille</string>
     <string name="error_sudoku">Aucune proposition trouvée.\nInsérez une valeur</string>
+    <string name="intersection_column">%1$d est disponible uniquement dans la colonne de cette grille\n donc on peut supprimer la valeur des autres cellules de la meme colonne des autres grilles</string>
+    <string name="intersection_row">%1$d est disponible uniquement dans la ligne de cette grille\n donc on peut supprimer la valeur des autres cellules de la meme ligne des autres grilles</string>
     <string name="success_sudoku">Sudoku résolu.\n</string>
 </resources>

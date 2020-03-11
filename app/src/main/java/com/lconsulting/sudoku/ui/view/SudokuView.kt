@@ -80,6 +80,14 @@ class SudokuView : GridLayout {
         }
     }
 
+    fun selectSquares(listSquareSelected: List<Pair<Int, Int>>, value: Int) {
+        listSquareSelected.forEach {
+            val grid = listGridView[it.first]
+            listGridViewSelected.add(grid)
+            grid.selectSquare(it.second, value)
+        }
+    }
+
     interface OnSudokuListener {
         fun onClickSquare(idGrid: Int, idSquare: Int)
     }

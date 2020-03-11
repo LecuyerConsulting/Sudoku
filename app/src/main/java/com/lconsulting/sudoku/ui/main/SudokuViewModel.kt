@@ -22,8 +22,15 @@ sealed class SudokuState {
     class PairAlgo(
         val sudoku: Array<SquareData>,
         val idRes: Int,
-        val listSquareSelected: List<Pair<Int, Int>>,
-        val listValueSelected: Set<Int>
+        val listValueSelected: Set<Int>,
+        val listSquareSelected: List<Pair<Int, Int>>
+    ) : SudokuState()
+
+    class IntersectionAlgo(
+        val sudoku: Array<SquareData>,
+        val idRes : Int,
+        val value : Int,
+        val listSquareSelected: List<Pair<Int, Int>>
     ) : SudokuState()
 
     class DisplayButton(val possibility: MutableSet<Int>) : SudokuState()
@@ -162,7 +169,113 @@ open class SudokuViewModel : ViewModel() {
         if (checkPair()) {
             return true
         }
+        if (checkIntersection()) {
+            return true
+        }
         return false
+    }
+
+    private fun checkIntersection(): Boolean {
+        for (idGrid in 0 until 9) {
+            val tabCompteur = Array<MutableSet<Int>>(9) { mutableSetOf() }
+            val startIndex = getStartIndexGridBy9(idGrid)
+            for (indexSquare in 0 until 9) {
+                val index = getIndexForGrid(startIndex, indexSquare)
+                if (sudoku[index].value == 0) {
+                    sudoku[index].possibility.forEach {
+                        tabCompteur[it - 1].add(index)
+                    }
+                }
+            }
+
+            if (checkIntersectionBy(
+                    tabCompteur,
+                    startIndex,
+                    ::getStartIndexRow,
+                    ::getIndexForRow,
+                    R.string.intersection_row
+                )
+            ) {
+                return true
+            }
+
+            if (checkIntersectionBy(
+                    tabCompteur,
+                    startIndex,
+                    ::getStartIndexColumn,
+                    ::getIndexForColumn,
+                    R.string.intersection_column
+                )
+            ) {
+                return true
+            }
+
+        }
+        return false
+    }
+
+    private fun checkIntersectionBy(
+        tabCompteur: Array<MutableSet<Int>>, startIndex: Int,
+        getStartIndex: (index: Int) -> Int,
+        getIndexFor: (startIndex: Int, position: Int) -> Int,
+        idRes: Int
+    ): Boolean {
+        for (i in 0 until 9) {
+            val setIndex = mutableSetOf<Int>()
+            if (tabCompteur[i].size in 1..3) {
+                tabCompteur[i].forEach {
+                    setIndex.add(getStartIndex(it))
+                }
+
+                if (setIndex.size == 1) {
+                    val result = updateDigitsAvailableInterserction(
+                        i + 1,
+                        tabCompteur[i],
+                        setIndex.toList()[0],
+                        getIndexFor
+                    )
+
+                    val listSquareSelected: MutableList<Pair<Int, Int>> = mutableListOf()
+
+                    tabCompteur[i].forEach {
+                        listSquareSelected.add(Pair(getIndexGrid(it), getIndexSquareInGrid(it)))
+                    }
+
+                    return if (result) {
+                        state.postValue(
+                            SudokuState.IntersectionAlgo(
+                                sudoku,
+                                idRes,
+                                i + 1,
+                                listSquareSelected
+                            )
+                        )
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    private fun updateDigitsAvailableInterserction(
+        value: Int, setIndex: MutableSet<Int>, startIndex: Int,
+        getIndexFor: (startIndex: Int, position: Int) -> Int
+    ): Boolean {
+        var result = false
+
+        for (i in 0 until 9) {
+            val index = getIndexFor(startIndex, i)
+            if (sudoku[index].value == 0 && !setIndex.contains(index)) {
+                val resultRemove = remove(sudoku[index], value)
+                if (resultRemove) {
+                    result = true
+                }
+            }
+        }
+        return result
     }
 
     /**
@@ -196,7 +309,7 @@ open class SudokuViewModel : ViewModel() {
         value: Int,
         startIndex: Int,
         getIndex: (start: Int, index: Int) -> Int,
-        action: (squareData: SquareData, value: Int) -> Unit
+        action: (squareData: SquareData, value: Int) -> Boolean
     ) {
         for (i in 0 until 9) {
             val index = getIndex(startIndex, i)
@@ -212,8 +325,8 @@ open class SudokuViewModel : ViewModel() {
      * @param squareData selected square
      * @param value to remove
      */
-    private fun remove(squareData: SquareData, value: Int) {
-        squareData.possibility.remove(value)
+    private fun remove(squareData: SquareData, value: Int): Boolean {
+        return squareData.possibility.remove(value)
     }
 
     /**
@@ -222,8 +335,8 @@ open class SudokuViewModel : ViewModel() {
      * @param squareData selected square
      * @param value to add
      */
-    private fun add(squareData: SquareData, value: Int) {
-        squareData.possibility.add(value)
+    private fun add(squareData: SquareData, value: Int): Boolean {
+        return squareData.possibility.add(value)
     }
 
     /**
@@ -401,10 +514,6 @@ open class SudokuViewModel : ViewModel() {
             )
         )
 
-//        if (setIndex.isEmpty()) {
-//            setIndex.addAll(getSquaresContainsPair(startIndexGrid, indexPair, ::getIndexForGrid, ::containsPair))
-//        }
-
         if (setIndex.size == 1) {
             val indexOtherPair = setIndex.toList()[0]
 
@@ -448,7 +557,7 @@ open class SudokuViewModel : ViewModel() {
     private fun checkPairBy(
         indexPair: Int,
         startIndex: Int,
-        getIndexFor: (start: Int, index: Int) -> Int
+        getIndexFor: (start: Int, position: Int) -> Int
     ): Boolean {
         var setIndex = mutableSetOf<Int>()
 
@@ -495,15 +604,15 @@ open class SudokuViewModel : ViewModel() {
             SudokuState.PairAlgo(
                 sudoku,
                 R.string.pair_found_grid,
-                listSquareSelected,
-                sudoku[indexPair].possibility
+                sudoku[indexPair].possibility,
+                listSquareSelected
             )
         )
     }
 
     private fun updateDigitsAvailableForPair(
         startIndex: Int, indexPair: Int, indexOtherPair: Int,
-        getIndexFor: (start: Int, index: Int) -> Int
+        getIndexFor: (start: Int, position: Int) -> Int
     ): Boolean {
         var isModification = false
         for (i in 0 until 9) {
@@ -523,7 +632,7 @@ open class SudokuViewModel : ViewModel() {
     private fun getSquaresContainsPair(
         startIndex: Int,
         indexPair: Int,
-        getIndexFor: (start: Int, index: Int) -> Int,
+        getIndexFor: (start: Int, position: Int) -> Int,
         contains: (Set<Int>, Set<Int>) -> Boolean
     ):
             MutableSet<Int> {
@@ -574,26 +683,26 @@ open class SudokuViewModel : ViewModel() {
      * compute the square index of row with startIndex & index
      *
      * @param startIndex in {0, 9, 18, 36, 45, 54, 63, 72}
-     * @param index in [0,8]
+     * @param position in [0,8]
      */
-    private fun getIndexForRow(startIndex: Int, index: Int): Int = startIndex + index
+    private fun getIndexForRow(startIndex: Int, position: Int): Int = startIndex + position
 
     /**
      * compute the square index of column with startIndex & index
      *
      * @param startIndex in [0,8]
-     * @param index in [0,8]
+     * @param position in [0,8]
      */
-    private fun getIndexForColumn(startIndex: Int, index: Int): Int = startIndex + index * 9
+    private fun getIndexForColumn(startIndex: Int, position: Int): Int = startIndex + position * 9
 
     /**
      * compute the square index of grid with startIndex & index
      *
      * @param startIndex in {0, 3, 6, 27, 30, 33, 54, 57, 60}
-     * @param index in [0,8]
+     * @param position in [0,8]
      */
-    private fun getIndexForGrid(startIndex: Int, index: Int): Int =
-        startIndex + (index % 3) + ((index / 3) * 9)
+    private fun getIndexForGrid(startIndex: Int, position: Int): Int =
+        startIndex + (position % 3) + ((position / 3) * 9)
 
     /**
      * compute first square index in row
@@ -629,7 +738,7 @@ open class SudokuViewModel : ViewModel() {
         (3 * (idGrid % 3) + (idSquare % 3)) + (((idSquare / 3) + (idGrid / 3) * 3) * 9)
 
     /**
-     * compute grid index with index
+     * compute grid index with square index
      * * if index is 70, return 8
      * @param index in  sudoku
      */

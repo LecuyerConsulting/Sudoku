@@ -2,7 +2,6 @@ package com.lconsulting.sudoku.ui.main
 
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.annotation.IntDef
@@ -12,7 +11,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.lconsulting.sudoku.R
 import com.lconsulting.sudoku.data.SquareData
-import com.lconsulting.sudoku.ui.view.SqareView
 import com.lconsulting.sudoku.ui.view.SudokuView
 import kotlinx.android.synthetic.main.main_fragment.*
 
@@ -209,18 +207,22 @@ class MainFragment : Fragment() {
                 val listValues = state.listValueSelected.toList()
                 tvState.text = resources.getString(state.idRes, listValues[0], listValues[1])
                 handler(state.sudoku)
-
+            }
+            is SudokuState.IntersectionAlgo -> {
+                sudoku.selectSquares(state.listSquareSelected, state.value)
+                tvState.text = resources.getString(state.idRes, state.value)
+                handler(state.sudoku)
             }
         }
     }
 
-    private fun handler(sudokayArray: Array<SquareData>){
+    private fun handler(sudokayArray: Array<SquareData>) {
         Handler().postDelayed({
             sudoku.updateSudoku(sudokayArray)
             if (isRepeat) {
                 viewModel.startAlgo()
             }
-        }, 500)
+        }, 5000)
     }
 
     private fun setRepeatMode(@StateResolver state: Int, idResDrawable: Int, isRepeat: Boolean) {
