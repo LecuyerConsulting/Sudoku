@@ -35,7 +35,6 @@ sealed class SudokuState {
 
     class DisplayButton(val possibility: MutableSet<Int>) : SudokuState()
     class Reset(val solution: Array<SquareData>) : SudokuState()
-    object InsertValue : SudokuState()
     class DisplayMessage(val idResString: Int) : SudokuState()
 }
 
@@ -79,8 +78,8 @@ open class SudokuViewModel : ViewModel() {
     /**
      * get digits available for the selected square
      *
-     * @param idGrid toto
-     * @param idSquare tata
+     * @param idGrid
+     * @param idSquare
      */
     fun getDigitAvailable(idGrid: Int, idSquare: Int) {
         val pos = getIndex(idGrid, idSquare)
@@ -104,9 +103,9 @@ open class SudokuViewModel : ViewModel() {
         val oldValue = sudoku[pos].value
 
         if (oldValue != 0) {
-            updateDigitsAvailable(oldValue, getStartIndexColumn(pos), ::getIndexForColumn, ::add)
-            updateDigitsAvailable(oldValue, getStartIndexRow(pos), ::getIndexForRow, ::add)
-            updateDigitsAvailable(oldValue, getStartIndexGrid(pos), ::getIndexForGrid, ::add)
+            updateDigitsAvailable(oldValue, getStartIndexColumn(pos), ::getIndexInColumn, ::add)
+            updateDigitsAvailable(oldValue, getStartIndexRow(pos), ::getIndexInRow, ::add)
+            updateDigitsAvailable(oldValue, getStartIndexGrid(pos), ::getIndexInGrid, ::add)
             sudoku[pos].value = 0
             digitsToFind++
         }
@@ -122,6 +121,10 @@ open class SudokuViewModel : ViewModel() {
         )
     }
 
+    /**
+     * if digits to find is 0, sudoku is solved
+     * else we search value
+     */
     fun startAlgo() {
         if (digitsToFind == 0) {
             state.postValue(SudokuState.DisplayMessage(R.string.success_sudoku))
@@ -140,8 +143,8 @@ open class SudokuViewModel : ViewModel() {
             return true
         }
         if (checkOneValue9Time(
-                ::getStartIndexGridBy9,
-                ::getIndexForGrid,
+                ::getStartIndexGridByPosition,
+                ::getIndexInGrid,
                 ::findIndexByGrid,
                 R.string.one_value_by_grid
             )
@@ -149,8 +152,8 @@ open class SudokuViewModel : ViewModel() {
             return true
         }
         if (checkOneValue9Time(
-                ::getStartIndexRowBy9,
-                ::getIndexForRow,
+                ::getStartIndexRowByPosition,
+                ::getIndexInRow,
                 ::findIndexByRow,
                 R.string.one_value_by_row
             )
@@ -158,8 +161,8 @@ open class SudokuViewModel : ViewModel() {
             return true
         }
         if (checkOneValue9Time(
-                ::getStartIndexColumnBy9,
-                ::getIndexForColumn,
+                ::getStartIndexColumnByPosition,
+                ::getIndexInColumn,
                 ::findIndexByColumn,
                 R.string.one_value_by_column
             )
@@ -175,12 +178,23 @@ open class SudokuViewModel : ViewModel() {
         return false
     }
 
+    /**
+     * for each index in grid, we keep every index by value
+     * value in [0,8], to get real value, add 1
+     * value -> {index...}
+     *
+     * index is square index who can have value
+     *
+     * and search an intersection
+     *
+     * @return true if there is an intersection
+     */
     private fun checkIntersection(): Boolean {
         for (idGrid in 0 until 9) {
             val tabCompteur = Array<MutableSet<Int>>(9) { mutableSetOf() }
-            val startIndex = getStartIndexGridBy9(idGrid)
+            val startIndex = getStartIndexGridByPosition(idGrid)
             for (indexSquare in 0 until 9) {
-                val index = getIndexForGrid(startIndex, indexSquare)
+                val index = getIndexInGrid(startIndex, indexSquare)
                 if (sudoku[index].value == 0) {
                     sudoku[index].possibility.forEach {
                         tabCompteur[it - 1].add(index)
@@ -190,9 +204,8 @@ open class SudokuViewModel : ViewModel() {
 
             if (checkIntersectionBy(
                     tabCompteur,
-                    startIndex,
                     ::getStartIndexRow,
-                    ::getIndexForRow,
+                    ::getIndexInRow,
                     R.string.intersection_row
                 )
             ) {
@@ -201,9 +214,8 @@ open class SudokuViewModel : ViewModel() {
 
             if (checkIntersectionBy(
                     tabCompteur,
-                    startIndex,
                     ::getStartIndexColumn,
-                    ::getIndexForColumn,
+                    ::getIndexInColumn,
                     R.string.intersection_column
                 )
             ) {
@@ -214,15 +226,27 @@ open class SudokuViewModel : ViewModel() {
         return false
     }
 
+    /**
+     *  search an intersection by grid
+     *  if a value is on 2 or 3 squares, who can contains the value
+     *  we check if thoses square are on the same row or colunms
+     *  if true, we remove this value from others squares from others grids on the same row or colunm
+     *
+     * @param tabCompteur
+     * @param getStartIndex function getStartIndexRow | getStartIndexColumn
+     * @param getIndexFor function getIndexInRow | getIndexInColumn
+     * @param idRes id ressource string
+     * @return true if there a modification on the sudoku
+     */
     private fun checkIntersectionBy(
-        tabCompteur: Array<MutableSet<Int>>, startIndex: Int,
+        tabCompteur: Array<MutableSet<Int>>,
         getStartIndex: (index: Int) -> Int,
         getIndexFor: (startIndex: Int, position: Int) -> Int,
         idRes: Int
     ): Boolean {
         for (i in 0 until 9) {
             val setIndex = mutableSetOf<Int>()
-            if (tabCompteur[i].size in 1..3) {
+            if (tabCompteur[i].size in 2..3) {
                 tabCompteur[i].forEach {
                     setIndex.add(getStartIndex(it))
                 }
@@ -260,6 +284,15 @@ open class SudokuViewModel : ViewModel() {
         return false
     }
 
+    /**
+     * update possibility on sudoku after an intersection is found
+     *
+     * @param value
+     * @param setIndex
+     * @param startIndex of row | column
+     * @param getIndexFor function getIndexInRow | getIndexInColumn
+     * @return
+     */
     private fun updateDigitsAvailableInterserction(
         value: Int, setIndex: MutableSet<Int>, startIndex: Int,
         getIndexFor: (startIndex: Int, position: Int) -> Int
@@ -292,9 +325,9 @@ open class SudokuViewModel : ViewModel() {
             this.idTextColor = idTextColor
         }
         digitsToFind--
-        updateDigitsAvailable(value, getStartIndexGrid(index), ::getIndexForGrid, ::remove)
-        updateDigitsAvailable(value, getStartIndexRow(index), ::getIndexForRow, ::remove)
-        updateDigitsAvailable(value, getStartIndexColumn(index), ::getIndexForColumn, ::remove)
+        updateDigitsAvailable(value, getStartIndexGrid(index), ::getIndexInGrid, ::remove)
+        updateDigitsAvailable(value, getStartIndexRow(index), ::getIndexInRow, ::remove)
+        updateDigitsAvailable(value, getStartIndexColumn(index), ::getIndexInColumn, ::remove)
     }
 
     /**
@@ -376,13 +409,13 @@ open class SudokuViewModel : ViewModel() {
      * @return true if square is found else false
      */
     private fun checkOneValue9Time(
-        getIndexBy9: (i: Int) -> Int,
-        getIndex: (start: Int, index: Int) -> Int,
+        getIndexByPosition: (position: Int) -> Int,
+        getIndexIn: (start: Int, index: Int) -> Int,
         findIndex: (start: Int, value: Int) -> Int,
         idRes: Int
     ): Boolean {
         for (i in 0 until 9) {
-            if (checkOneValue(getIndexBy9(i), getIndex, findIndex, idRes)) {
+            if (checkOneValue(getIndexByPosition(i), getIndexIn, findIndex, idRes)) {
                 return true
             }
         }
@@ -433,7 +466,7 @@ open class SudokuViewModel : ViewModel() {
     }
 
     /**
-     * return index in row if value is found
+     * return square index in row if the square contains this value on his possibility
      *
      * @param startIndex will be this number : 0, 8, 18, 27, ..., 72
      * @param value to insert in square
@@ -450,7 +483,7 @@ open class SudokuViewModel : ViewModel() {
     }
 
     /**
-     * return index in column if value is found
+     * return square index in column if the square contains this value on his possibility
      *
      * @param startIndex will be this number : 0, 1, 2, 3, ..., 8
      * @param value to insert in square
@@ -467,7 +500,7 @@ open class SudokuViewModel : ViewModel() {
     }
 
     /**
-     * return index in column if value is found
+     * return square index in grid if the square contains this value on his possibility
      *
      * @param startIndex will be this number : 0, 3, 6, 27, ..., 60
      * @param value to insert in square
@@ -483,6 +516,14 @@ open class SudokuViewModel : ViewModel() {
         return -1
     }
 
+    /**
+     * search a square who contains only 2 possibilities
+     * when it's found, search if there is an other square
+     * on the grid | row | colunm who contains thoses 2 values
+     * with this function checkPairByGrid
+     *
+     * @return true if pair is found
+     */
     private fun checkPair(): Boolean {
         for (i in sudoku.indices) {
             val square = sudoku[i]
@@ -490,10 +531,10 @@ open class SudokuViewModel : ViewModel() {
                 if (checkPairByGrid(i)) {
                     return true
                 }
-                if (checkPairBy(i, getStartIndexRow(i), ::getIndexForRow)) {
+                if (checkPairBy(i, getStartIndexRow(i), ::getIndexInRow)) {
                     return true
                 }
-                if (checkPairBy(i, getStartIndexColumn(i), ::getIndexForColumn)) {
+                if (checkPairBy(i, getStartIndexColumn(i), ::getIndexInColumn)) {
                     return true
                 }
             }
@@ -501,6 +542,12 @@ open class SudokuViewModel : ViewModel() {
         return false
     }
 
+    /**
+     * search if there is an other square
+     * on the grid  who contains thoses 2 values
+     * @param indexPair
+     * @return true if pair is found
+     */
     private fun checkPairByGrid(indexPair: Int): Boolean {
         val startIndexGrid = getStartIndexGrid(indexPair)
         var setIndex = mutableSetOf<Int>()
@@ -509,7 +556,7 @@ open class SudokuViewModel : ViewModel() {
             getSquaresContainsPair(
                 startIndexGrid,
                 indexPair,
-                ::getIndexForGrid,
+                ::getIndexInGrid,
                 ::containsOnlyPair
             )
         )
@@ -521,7 +568,7 @@ open class SudokuViewModel : ViewModel() {
                 startIndexGrid,
                 indexPair,
                 indexOtherPair,
-                ::getIndexForGrid
+                ::getIndexInGrid
             )
 
             val startIndexColumn = getStartIndexColumn(indexPair)
@@ -530,7 +577,7 @@ open class SudokuViewModel : ViewModel() {
                     startIndexColumn,
                     indexPair,
                     indexOtherPair,
-                    ::getIndexForColumn
+                    ::getIndexInColumn
                 )
             }
 
@@ -540,7 +587,7 @@ open class SudokuViewModel : ViewModel() {
                     startIndexRow,
                     indexPair,
                     indexOtherPair,
-                    ::getIndexForRow
+                    ::getIndexInRow
                 )
             }
 
@@ -554,6 +601,15 @@ open class SudokuViewModel : ViewModel() {
         return false
     }
 
+    /**
+     * search if there is an other square
+     * on the row | colunm  who contains thoses 2 values
+     *
+     * @param indexPair
+     * @param startIndex row | column
+     * @param getIndexFor function getIndexInRow | getIndexInColumn
+     * @return true if pair is found
+     */
     private fun checkPairBy(
         indexPair: Int,
         startIndex: Int,
@@ -590,6 +646,12 @@ open class SudokuViewModel : ViewModel() {
         return false
     }
 
+    /**
+     * we update the state to refresh the view
+     *
+     * @param indexPair
+     * @param indexOtherPair
+     */
     private fun postValuePair(indexPair: Int, indexOtherPair: Int) {
         val listSquareSelected = ArrayList<Pair<Int, Int>>()
         listSquareSelected.add(Pair(getIndexGrid(indexPair), getIndexSquareInGrid(indexPair)))
@@ -610,6 +672,15 @@ open class SudokuViewModel : ViewModel() {
         )
     }
 
+    /**
+     * update digits available in square by grid | row | column
+     *
+     * @param startIndex
+     * @param indexPair
+     * @param indexOtherPair
+     * @param getIndexFor
+     * @return
+     */
     private fun updateDigitsAvailableForPair(
         startIndex: Int, indexPair: Int, indexOtherPair: Int,
         getIndexFor: (start: Int, position: Int) -> Int
@@ -629,6 +700,15 @@ open class SudokuViewModel : ViewModel() {
         return isModification
     }
 
+    /**
+     * search a square who contains the pair
+     *
+     * @param startIndex
+     * @param indexPair
+     * @param getIndexFor
+     * @param contains
+     * @return
+     */
     private fun getSquaresContainsPair(
         startIndex: Int,
         indexPair: Int,
@@ -648,78 +728,92 @@ open class SudokuViewModel : ViewModel() {
         return setIndex
     }
 
+    /**
+     * check if setPossibility contains 2 values and is identical to setPossibilityPair
+     *
+     * @param setPossibility
+     * @param setPossibilityPair
+     */
     private fun containsOnlyPair(setPossibility: Set<Int>, setPossibilityPair: Set<Int>) =
         setPossibility.size == 2 && setPossibility.containsAll(setPossibilityPair)
 
+    /**
+     * remove values from square indexPair in square index
+     * true if there are values to remove
+     *
+     * @param index
+     * @param indexPair
+     * @return true if there are some values to remove
+     */
     private fun removeValuePair(index: Int, indexPair: Int): Boolean {
         return sudoku[index].possibility.removeAll(sudoku[indexPair].possibility)
     }
 
     /**
-     * compute the first square index of column with index
+     * compute the first index of column with position
      *
-     * @param index in [0,8]
+     * @param position in [0,8]
      * @return value in [0,8]
      */
-    private fun getStartIndexColumnBy9(index: Int): Int = index
+    private fun getStartIndexColumnByPosition(position: Int): Int = position
 
     /**
-     * compute the first square index of grid with index
+     * compute the first index of grid with position
      *
-     * @param index in [0,8]
+     * @param position in [0,8]
      * @return one value in this set {0, 3, 6, 27, 30, 33, 54, 57, 60}
      */
-    private fun getStartIndexGridBy9(index: Int): Int = (3 * index) + (9 * 2 * (index / 3))
+    private fun getStartIndexGridByPosition(position: Int): Int = (3 * position) + (9 * 2 * (position / 3))
 
     /**
-     * compute the first square index of row with index
+     * compute the first square index of row with position
      *
-     * @param index in [0,8]
+     * @param position in [0,8]
      * @return one value in this set {0, 9, 18, 36, 45, 54, 63, 72}
      */
-    private fun getStartIndexRowBy9(index: Int): Int = index * 9
+    private fun getStartIndexRowByPosition(position: Int): Int = position * 9
 
     /**
-     * compute the square index of row with startIndex & index
+     * compute the square index of row with startIndex & position
      *
      * @param startIndex in {0, 9, 18, 36, 45, 54, 63, 72}
      * @param position in [0,8]
      */
-    private fun getIndexForRow(startIndex: Int, position: Int): Int = startIndex + position
+    private fun getIndexInRow(startIndex: Int, position: Int): Int = startIndex + position
 
     /**
-     * compute the square index of column with startIndex & index
+     * compute index of column with startIndex & position
      *
      * @param startIndex in [0,8]
      * @param position in [0,8]
      */
-    private fun getIndexForColumn(startIndex: Int, position: Int): Int = startIndex + position * 9
+    private fun getIndexInColumn(startIndex: Int, position: Int): Int = startIndex + position * 9
 
     /**
-     * compute the square index of grid with startIndex & index
+     * compute index in grid with startIndex & position
      *
      * @param startIndex in {0, 3, 6, 27, 30, 33, 54, 57, 60}
      * @param position in [0,8]
      */
-    private fun getIndexForGrid(startIndex: Int, position: Int): Int =
+    private fun getIndexInGrid(startIndex: Int, position: Int): Int =
         startIndex + (position % 3) + ((position / 3) * 9)
 
     /**
-     * compute first square index in row
+     * compute first square index in row who contains index
      * * if index is 70, return 63
      * @param index in  sudoku
      */
     private fun getStartIndexRow(index: Int) = (index / 9) * 9
 
     /**
-     * compute first square index in column
+     * compute first square index in column who contains index
      * * if index is 70, return 7
      * @param index in  sudoku
      */
     private fun getStartIndexColumn(index: Int) = index % 9
 
     /**
-     * compute first square index in grid
+     * compute first square index in grid who contains index
      * * if index is 70, return 60
      * @param index in  sudoku
      */
@@ -738,7 +832,7 @@ open class SudokuViewModel : ViewModel() {
         (3 * (idGrid % 3) + (idSquare % 3)) + (((idSquare / 3) + (idGrid / 3) * 3) * 9)
 
     /**
-     * compute grid index with square index
+     * compute grid index with index
      * * if index is 70, return 8
      * @param index in  sudoku
      */
