@@ -194,9 +194,6 @@ class MainFragment : Fragment() {
                 sudoku.updateSudoku(state.solution)
                 tvState.text = resources.getString(R.string.insert_a_value)
             }
-            is SudokuState.InsertValue -> {
-                tvState.text = resources.getString(R.string.insert_a_value)
-            }
             is SudokuState.DisplayMessage -> {
                 setRepeatMode(PLAY, R.drawable.baseline_play_arrow_black_24, false)
                 tvState.text = resources.getString(state.idResString)
@@ -222,7 +219,7 @@ class MainFragment : Fragment() {
             if (isRepeat) {
                 viewModel.startAlgo()
             }
-        }, 5000)
+        }, 1000)
     }
 
     private fun setRepeatMode(@StateResolver state: Int, idResDrawable: Int, isRepeat: Boolean) {

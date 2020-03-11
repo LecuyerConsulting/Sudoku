@@ -28,8 +28,8 @@ sealed class SudokuState {
 
     class IntersectionAlgo(
         val sudoku: Array<SquareData>,
-        val idRes : Int,
-        val value : Int,
+        val idRes: Int,
+        val value: Int,
         val listSquareSelected: List<Pair<Int, Int>>
     ) : SudokuState()
 
@@ -145,7 +145,6 @@ open class SudokuViewModel : ViewModel() {
         if (checkOneValue9Time(
                 ::getStartIndexGridByPosition,
                 ::getIndexInGrid,
-                ::findIndexByGrid,
                 R.string.one_value_by_grid
             )
         ) {
@@ -154,7 +153,6 @@ open class SudokuViewModel : ViewModel() {
         if (checkOneValue9Time(
                 ::getStartIndexRowByPosition,
                 ::getIndexInRow,
-                ::findIndexByRow,
                 R.string.one_value_by_row
             )
         ) {
@@ -163,7 +161,6 @@ open class SudokuViewModel : ViewModel() {
         if (checkOneValue9Time(
                 ::getStartIndexColumnByPosition,
                 ::getIndexInColumn,
-                ::findIndexByColumn,
                 R.string.one_value_by_column
             )
         ) {
@@ -411,11 +408,10 @@ open class SudokuViewModel : ViewModel() {
     private fun checkOneValue9Time(
         getIndexByPosition: (position: Int) -> Int,
         getIndexIn: (start: Int, index: Int) -> Int,
-        findIndex: (start: Int, value: Int) -> Int,
         idRes: Int
     ): Boolean {
         for (i in 0 until 9) {
-            if (checkOneValue(getIndexByPosition(i), getIndexIn, findIndex, idRes)) {
+            if (checkOneValue(getIndexByPosition(i), getIndexIn, idRes)) {
                 return true
             }
         }
@@ -433,24 +429,23 @@ open class SudokuViewModel : ViewModel() {
     private fun checkOneValue(
         startIndex: Int,
         getIndex: (start: Int, index: Int) -> Int,
-        findIndex: (start: Int, value: Int) -> Int,
         idRes: Int
     ): Boolean {
-        val tabCompteur = IntArray(9) { 0 }
+        val tabCompteur = Array<MutableSet<Int>>(9) { mutableSetOf() }
 
-        for (i in 0 until 9) {
-            val index = getIndex(startIndex, i)
+        for (position in 0 until 9) {
+            val index = getIndex(startIndex, position)
             if (sudoku[index].value == 0) {
                 sudoku[index].possibility.forEach {
-                    tabCompteur[it - 1] = tabCompteur[it - 1] + 1
+                    tabCompteur[it - 1].add(index)
                 }
             }
         }
 
         for (i in tabCompteur.indices) {
-            if (tabCompteur[i] == 1) {
+            if (tabCompteur[i].size == 1) {
                 val value = i + 1
-                val index = findIndex(startIndex, value)
+                val index = tabCompteur[i].toList()[0]
                 insertValue(value, R.color.colorValueFound, index)
 
                 state.postValue(
@@ -763,7 +758,8 @@ open class SudokuViewModel : ViewModel() {
      * @param position in [0,8]
      * @return one value in this set {0, 3, 6, 27, 30, 33, 54, 57, 60}
      */
-    private fun getStartIndexGridByPosition(position: Int): Int = (3 * position) + (9 * 2 * (position / 3))
+    private fun getStartIndexGridByPosition(position: Int): Int =
+        (3 * position) + (9 * 2 * (position / 3))
 
     /**
      * compute the first square index of row with position
