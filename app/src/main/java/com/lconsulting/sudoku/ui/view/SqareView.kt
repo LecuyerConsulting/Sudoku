@@ -14,6 +14,8 @@ import kotlinx.android.synthetic.main.view_square.view.*
 
 class SqareView : ConstraintLayout {
 
+    private var squareData : SquareData = SquareData()
+
     private val listSquareView: MutableList<TextView> = mutableListOf()
 
     constructor(context: Context) : this(context, null)
@@ -32,6 +34,7 @@ class SqareView : ConstraintLayout {
     }
 
     fun updateSquare(square: SquareData) {
+        squareData = square
         if (square.value != 0) {
             tvValue.apply {
                 text = square.value.toString()
@@ -83,6 +86,24 @@ class SqareView : ConstraintLayout {
             setTextViewUI(listSquareView[it-1], R.color.colorValueFound, Typeface.BOLD)
         }
         selectSquare()
+    }
+
+    fun enlightenedValue(value: Int) {
+        if(squareData.value == value){
+            setTextViewUI(tvValue, R.color.colorValueFound, Typeface.BOLD)
+        }else if(squareData.possibility.contains(value)){
+            setTextViewUI(listSquareView[value-1], R.color.colorValueFound, Typeface.BOLD)
+        }
+    }
+
+    fun unEnlightenedValue() {
+        if(squareData.value != 0){
+            setTextViewUI(tvValue, squareData.idTextColor, Typeface.NORMAL)
+        }else{
+            listSquareView.forEach {
+                setTextViewUI(it, R.color.colorText, Typeface.NORMAL)
+            }
+        }
     }
 
 }

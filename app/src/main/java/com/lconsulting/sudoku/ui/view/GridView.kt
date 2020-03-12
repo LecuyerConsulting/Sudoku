@@ -73,6 +73,18 @@ class GridView : GridLayout {
 
     }
 
+    fun enlightenedValue(value: Int) {
+        listSquareView.forEach {
+            it.enlightenedValue(value)
+        }
+    }
+
+    fun unEnlightenedValue() {
+        listSquareView.forEach {
+            it.unEnlightenedValue()
+        }
+    }
+
     interface OnGridListener {
         fun onClickSquare(position: Int)
     }

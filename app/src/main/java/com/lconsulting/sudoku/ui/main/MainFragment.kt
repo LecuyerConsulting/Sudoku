@@ -3,6 +3,7 @@ package com.lconsulting.sudoku.ui.main
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
+import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.IntDef
 import androidx.core.view.forEach
@@ -39,11 +40,17 @@ class MainFragment : Fragment() {
 
     private val onClickListener = View.OnClickListener { v ->
         when (v) {
-            is TextView -> {
+            is Button -> {
+//                sudoku.unEnlightenedValue()
+//                sudoku.enlightenedValue(v.text.toString().toInt())
                 viewModel.insertValueByUser(v.text.toString(), idGrid, idSquare)
                 disableDigitsButton()
             }
             else -> when (v.id) {
+                R.id.main ->{
+//                    sudoku.unEnlightenedValue()
+//                    sudoku.unSelectSquare()
+                }
                 R.id.btnPlay -> {
                     if (statePlayer == STOP) {
                         setRepeatMode(PLAY, R.drawable.baseline_play_arrow_black_24, false)
@@ -96,6 +103,8 @@ class MainFragment : Fragment() {
         }
 
         sudoku.setOnSudokuListener(onSudokuListener)
+
+        main.setOnClickListener(onClickListener)
 
         disableDigitsButton()
         hideActionButton()
@@ -193,8 +202,8 @@ class MainFragment : Fragment() {
         viewModel.insertValueByUser("9",8, 7)
         viewModel.insertValueByUser("0",8, 8)
 
-        isRepeat = true
-        viewModel.startAlgo()
+//        isRepeat = true
+//        viewModel.startAlgo()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -58,11 +58,7 @@ class SudokuView : GridLayout {
             listGridView[grid].updateGrid(square, solution[i])
         }
 
-        listGridViewSelected.forEach {
-            it.unSelectedSquare()
-        }
-
-        listGridViewSelected.clear()
+        unSelectSquare()
     }
 
     fun selectSquare(idGrid: Int, idSquare: Int, value: Int) {
@@ -85,6 +81,26 @@ class SudokuView : GridLayout {
             val grid = listGridView[it.first]
             listGridViewSelected.add(grid)
             grid.selectSquare(it.second, value)
+        }
+    }
+
+    fun unSelectSquare(){
+        listGridViewSelected.forEach {
+            it.unSelectedSquare()
+        }
+
+        listGridViewSelected.clear()
+    }
+
+    fun enlightenedValue(value: Int) {
+        listGridView.forEach {
+            it.enlightenedValue(value)
+        }
+    }
+
+    fun unEnlightenedValue() {
+        listGridView.forEach {
+            it.unEnlightenedValue()
         }
     }
 
