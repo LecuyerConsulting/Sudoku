@@ -97,28 +97,30 @@ open class SudokuViewModel : ViewModel() {
      * @param idSquare square id on grid (grid id)
      */
     fun insertValueByUser(sValue: String, idGrid: Int, idSquare: Int) {
-        val pos = getIndex(idGrid, idSquare)
+        if (sValue != "0") {
+            val pos = getIndex(idGrid, idSquare)
 
-        val newValue = sValue.toInt()
-        val oldValue = sudoku[pos].value
+            val newValue = sValue.toInt()
+            val oldValue = sudoku[pos].value
 
-        if (oldValue != 0) {
-            updateDigitsAvailable(oldValue, getStartIndexColumn(pos), ::getIndexInColumn, ::add)
-            updateDigitsAvailable(oldValue, getStartIndexRow(pos), ::getIndexInRow, ::add)
-            updateDigitsAvailable(oldValue, getStartIndexGrid(pos), ::getIndexInGrid, ::add)
-            sudoku[pos].value = 0
-            digitsToFind++
-        }
+            if (oldValue != 0) {
+                updateDigitsAvailable(oldValue, getStartIndexColumn(pos), ::getIndexInColumn, ::add)
+                updateDigitsAvailable(oldValue, getStartIndexRow(pos), ::getIndexInRow, ::add)
+                updateDigitsAvailable(oldValue, getStartIndexGrid(pos), ::getIndexInGrid, ::add)
+                sudoku[pos].value = 0
+                digitsToFind++
+            }
 
-        insertValue(newValue, R.color.colorValue, pos)
+            insertValue(newValue, R.color.colorValue, pos)
 
-        state.postValue(
-            SudokuState.FillSquare(
-                sudoku,
-                R.string.insert_value,
-                newValue
+            state.postValue(
+                SudokuState.FillSquare(
+                    sudoku,
+                    R.string.insert_value,
+                    newValue
+                )
             )
-        )
+        }
     }
 
     /**
@@ -262,7 +264,7 @@ open class SudokuViewModel : ViewModel() {
                         listSquareSelected.add(Pair(getIndexGrid(it), getIndexSquareInGrid(it)))
                     }
 
-                    return if (result) {
+                    if (result) {
                         state.postValue(
                             SudokuState.IntersectionAlgo(
                                 sudoku,
@@ -271,9 +273,7 @@ open class SudokuViewModel : ViewModel() {
                                 listSquareSelected
                             )
                         )
-                        true
-                    } else {
-                        false
+                        return true
                     }
                 }
             }
