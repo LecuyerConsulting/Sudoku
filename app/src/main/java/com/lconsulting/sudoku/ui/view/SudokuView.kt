@@ -61,28 +61,11 @@ class SudokuView : GridLayout {
         unSelectSquare()
     }
 
-    fun selectSquare(listSquareSelected: List<Pair<Int, Int>>, value: Int, idResColor : Int) {
-        listSquareSelected.forEach {
-            val grid = listGridView[it.first]
-            listGridViewSelected.add(grid)
-            grid.selectSquare(it.second, value, idResColor)
-        }
-
-    }
-
-    fun selectSquares(listSquareSelected: List<Pair<Int, Int>>, listValueSelected: Set<Int>, idResColor : Int) {
+    fun selectSquares(listSquareSelected: List<Pair<Int, Int>>, listValueSelected: List<Int>, idResColor : Int) {
         listSquareSelected.forEach {
             val grid = listGridView[it.first]
             listGridViewSelected.add(grid)
             grid.selectSquare(it.second, listValueSelected, idResColor)
-        }
-    }
-
-    fun selectSquares(listSquareSelected: List<Pair<Int, Int>>, value: Int) {
-        listSquareSelected.forEach {
-            val grid = listGridView[it.first]
-            listGridViewSelected.add(grid)
-            grid.selectSquare(it.second, value, R.color.colorValueFound)
         }
     }
 

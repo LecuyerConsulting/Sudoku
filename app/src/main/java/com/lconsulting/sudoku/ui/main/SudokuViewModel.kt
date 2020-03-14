@@ -11,26 +11,10 @@ sealed class SudokuState {
         val sudoku: Array<SquareData>, val idRes: Int, val value: Int
     ) : SudokuState()
 
-    class FillSquareAlgo(
-        val sudoku: Array<SquareData>,
-        val idRes: Int,
-        val value: Int,
-        val listSquareSelectedToKeep: List<Pair<Int, Int>>,
-        val listSquareSelectedToRemove: List<Pair<Int, Int>>
-    ) : SudokuState()
-
-    class PairAlgo(
+    class SuccessAlgo(
         val sudoku: Array<SquareData>,
         val idRes: Int,
         val listValueSelected: Set<Int>,
-        val listSquareSelectedToKeep: List<Pair<Int, Int>>,
-        val listSquareSelectedToRemove: List<Pair<Int, Int>>
-    ) : SudokuState()
-
-    class IntersectionAlgo(
-        val sudoku: Array<SquareData>,
-        val idRes: Int,
-        val value: Int,
         val listSquareSelectedToKeep: List<Pair<Int, Int>>,
         val listSquareSelectedToRemove: List<Pair<Int, Int>>
     ) : SudokuState()
@@ -280,10 +264,10 @@ open class SudokuViewModel : ViewModel() {
                         }
 
                         state.postValue(
-                            SudokuState.IntersectionAlgo(
+                            SudokuState.SuccessAlgo(
                                 sudoku,
                                 idRes,
-                                i + 1,
+                                mutableSetOf(i + 1),
                                 convertSetIndexToLIstPair(setIndexSelectedToKeep),
                                 convertSetIndexToLIstPair(setIndexSelectedToRemove)
                             )
@@ -406,10 +390,10 @@ open class SudokuViewModel : ViewModel() {
                 setIndexSelectedToRemove.remove(index)
 
                 state.postValue(
-                    SudokuState.FillSquareAlgo(
+                    SudokuState.SuccessAlgo(
                         sudoku,
                         R.string.one_value_by_square,
-                        value,
+                        mutableSetOf(value),
                         convertSetIndexToLIstPair(mutableSetOf(index)),
                         convertSetIndexToLIstPair(setIndexSelectedToRemove)
                     )
@@ -514,8 +498,8 @@ open class SudokuViewModel : ViewModel() {
                 setIndexSelectedToRemove.remove(index)
 
                 state.postValue(
-                    SudokuState.FillSquareAlgo(
-                        sudoku, idRes, value,
+                    SudokuState.SuccessAlgo(
+                        sudoku, idRes, mutableSetOf(value),
                         convertSetIndexToLIstPair(mutableSetOf(index)),
                         convertSetIndexToLIstPair(setIndexSelectedToRemove)
                     )
@@ -784,7 +768,7 @@ open class SudokuViewModel : ViewModel() {
         listIndexToRemove: MutableList<Pair<Int, Int>>
     ) {
         state.postValue(
-            SudokuState.PairAlgo(
+            SudokuState.SuccessAlgo(
                 sudoku,
                 R.string.pair_found_grid,
                 sudoku[indexPair].possibility,

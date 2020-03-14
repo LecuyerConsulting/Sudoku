@@ -223,10 +223,15 @@ class MainFragment : Fragment() {
                 sudoku.updateSudoku(state.sudoku)
                 tvState.text = resources.getString(state.idRes, state.value)
             }
-            is SudokuState.FillSquareAlgo -> {
-                tvState.text = resources.getString(state.idRes, state.value)
-                sudoku.selectSquare(state.listSquareSelectedToKeep, state.value, R.color.colorValueFound)
-                sudoku.selectSquare(state.listSquareSelectedToRemove, state.value, R.color.colorValueRemove)
+            is SudokuState.SuccessAlgo -> {
+                val listValueSelected = state.listValueSelected.toList()
+                tvState.text =  when(state.listValueSelected.size){
+                    2 -> resources.getString(state.idRes, listValueSelected[0], listValueSelected[1])
+                    else -> resources.getString(state.idRes, listValueSelected[0])
+                }
+
+                sudoku.selectSquares(state.listSquareSelectedToKeep, listValueSelected, R.color.colorValueFound)
+                sudoku.selectSquares(state.listSquareSelectedToRemove, listValueSelected, R.color.colorValueRemove)
                 handler(state.sudoku)
             }
             is SudokuState.Reset -> {
@@ -238,19 +243,19 @@ class MainFragment : Fragment() {
                 tvState.text = resources.getString(state.idResString)
             }
             is SudokuState.DisplayButton -> updateDigitsButton(state.possibility)
-            is SudokuState.PairAlgo -> {
-                sudoku.selectSquares(state.listSquareSelectedToKeep, state.listValueSelected, R.color.colorValueFound)
-                sudoku.selectSquares(state.listSquareSelectedToRemove, state.listValueSelected, R.color.colorValueRemove)
-                val listValues = state.listValueSelected.toList()
-                tvState.text = resources.getString(state.idRes, listValues[0], listValues[1])
-                handler(state.sudoku)
-            }
-            is SudokuState.IntersectionAlgo -> {
-                sudoku.selectSquare(state.listSquareSelectedToKeep, state.value, R.color.colorValueFound)
-                sudoku.selectSquare(state.listSquareSelectedToRemove, state.value, R.color.colorValueRemove)
-                tvState.text = resources.getString(state.idRes, state.value)
-                handler(state.sudoku)
-            }
+//            is SudokuState.PairAlgo -> {
+//                sudoku.selectSquares(state.listSquareSelectedToKeep, state.listValueSelected, R.color.colorValueFound)
+//                sudoku.selectSquares(state.listSquareSelectedToRemove, state.listValueSelected, R.color.colorValueRemove)
+//                val listValues = state.listValueSelected.toList()
+//                tvState.text = resources.getString(state.idRes, listValues[0], listValues[1])
+//                handler(state.sudoku)
+//            }
+//            is SudokuState.IntersectionAlgo -> {
+//                sudoku.selectSquare(state.listSquareSelectedToKeep, state.value, R.color.colorValueFound)
+//                sudoku.selectSquare(state.listSquareSelectedToRemove, state.value, R.color.colorValueRemove)
+//                tvState.text = resources.getString(state.idRes, state.value)
+//                handler(state.sudoku)
+//            }
         }
     }
 

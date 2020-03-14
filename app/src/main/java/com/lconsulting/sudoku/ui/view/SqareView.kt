@@ -58,11 +58,6 @@ class SqareView : ConstraintLayout {
         }
     }
 
-    fun selectSquare(value: Int, idResColor : Int) {
-        setTextViewUI(listSquareView[value - 1], idResColor, Typeface.BOLD)
-        selectSquare()
-    }
-
     fun unSelectSquare() {
         listSquareView.forEach {
             setTextViewUI(it, R.color.colorText, Typeface.NORMAL)
@@ -81,8 +76,8 @@ class SqareView : ConstraintLayout {
         }
     }
 
-    fun selectSquare(listValueSelected: Set<Int>, idResColor : Int) {
-        listValueSelected.toList().forEach {
+    fun selectSquare(listValueSelected: List<Int>, idResColor : Int) {
+        listValueSelected.forEach {
             setTextViewUI(listSquareView[it-1], idResColor, Typeface.BOLD)
         }
         selectSquare()
