@@ -60,16 +60,16 @@ class GridView : GridLayout {
         listSquareViewSelected.clear()
     }
 
-    fun selectSquare(idSquare: Int, value: Int) {
+    fun selectSquare(idSquare: Int, value: Int, idResColor : Int) {
         val square = listSquareView[idSquare]
         listSquareViewSelected.add(square)
-        square.selectSquare(value)
+        square.selectSquare(value, idResColor)
     }
 
-    fun selectSquare(idSquare: Int, listValueSelected: Set<Int>) {
+    fun selectSquare(idSquare: Int, listValueSelected: Set<Int>, idResColor : Int) {
         val square = listSquareView[idSquare]
         listSquareViewSelected.add(square)
-        square.selectSquare(listValueSelected)
+        square.selectSquare(listValueSelected, idResColor)
 
     }
 

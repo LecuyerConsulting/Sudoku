@@ -9,4 +9,5 @@
     <color name="colorText">@android:color/black</color>
     <color name="colorValue">@color/colorPrimary</color>
     <color name="colorValueFound">@color/colorAccent</color>
+    <color name="colorValueRemove">#FF0000</color>
 </resources>
