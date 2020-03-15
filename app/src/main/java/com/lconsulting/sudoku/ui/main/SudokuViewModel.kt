@@ -675,7 +675,8 @@ open class SudokuViewModel : ViewModel() {
                 if (checkPairBy(
                         index, getStartIndexRow(index), ::getIndexInRow,
                         isColunm = false,
-                        isRow = true
+                        isRow = true,
+                        R.string.pair_found_row
                     )
                 ) {
                     return true
@@ -683,7 +684,8 @@ open class SudokuViewModel : ViewModel() {
                 if (checkPairBy(
                         index, getStartIndexColumn(index), ::getIndexInColumn,
                         isColunm = true,
-                        isRow = false
+                        isRow = false,
+                        R.string.pair_found_coloumn
                     )
                 ) {
                     return true
@@ -714,6 +716,7 @@ open class SudokuViewModel : ViewModel() {
         )
 
         if (setIndex.size == 1) {
+            var idResString : Int = R.string.pair_found_grid
             val indexOtherPair = setIndex.toList()[0]
 
             val setIndexSelected = mutableSetOf<Int>()
@@ -738,6 +741,7 @@ open class SudokuViewModel : ViewModel() {
                     indexOtherPair,
                     ::getIndexInColumn
                 )
+                idResString = R.string.pair_found_grid_column
             }
 
             val startIndexRow = getStartIndexRow(indexPair)
@@ -750,6 +754,7 @@ open class SudokuViewModel : ViewModel() {
                     indexOtherPair,
                     ::getIndexInRow
                 )
+                idResString = R.string.pair_found_grid_row
             }
 
             var setIndexSelectedToRemove = getImpactedIndex(
@@ -766,7 +771,8 @@ open class SudokuViewModel : ViewModel() {
                 postValuePair(
                     indexPair,
                     convertSetIndexToLIstPair(setIndexSelectedTKeep),
-                    convertSetIndexToLIstPair(setIndexSelectedToRemove)
+                    convertSetIndexToLIstPair(setIndexSelectedToRemove),
+                    idResString
                 )
                 true
             } else {
@@ -791,7 +797,8 @@ open class SudokuViewModel : ViewModel() {
         startIndex: Int,
         getIndexFor: (start: Int, position: Int) -> Int,
         isColunm: Boolean,
-        isRow: Boolean
+        isRow: Boolean,
+        idResString : Int
     ): Boolean {
         var setIndex = mutableSetOf<Int>()
 
@@ -828,8 +835,8 @@ open class SudokuViewModel : ViewModel() {
                 postValuePair(
                     indexPair,
                     convertSetIndexToLIstPair(setIndexSelectedTKeep),
-                    convertSetIndexToLIstPair(setIndexSelectedToRemove)
-
+                    convertSetIndexToLIstPair(setIndexSelectedToRemove),
+                    idResString
                 )
                 true
             } else {
@@ -844,17 +851,19 @@ open class SudokuViewModel : ViewModel() {
      * we update the state to refresh the view
      *
      * @param indexPair
-     * @param indexOtherPair
+     * @param listIndexToKeep
+     * @param listIndexToRemove
      */
     private fun postValuePair(
         indexPair: Int,
         listIndexToKeep: MutableList<Pair<Int, Int>>,
-        listIndexToRemove: MutableList<Pair<Int, Int>>
+        listIndexToRemove: MutableList<Pair<Int, Int>>,
+        idRes: Int
     ) {
         state.postValue(
             SudokuState.SuccessAlgo(
                 sudoku,
-                R.string.pair_found_grid,
+                idRes,
                 sudoku[indexPair].possibility,
                 listIndexToKeep,
                 listIndexToRemove

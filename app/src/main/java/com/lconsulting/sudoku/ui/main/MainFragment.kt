@@ -44,6 +44,7 @@ class MainFragment : Fragment() {
                 if (idGrid == -1 && idSquare == -1) {
                     sudoku.unEnlightenedValue()
                     sudoku.enlightenedValue(v.text.toString().toInt())
+                    tvState.text = resources.getString(R.string.insert_a_value)
                 } else {
                     viewModel.insertValueByUser(v.text.toString(), idGrid, idSquare)
                     enableDigitsButton(true)
@@ -58,6 +59,7 @@ class MainFragment : Fragment() {
                     enableDigitsButton(true)
                     idGrid = -1
                     idSquare = -1
+                    tvState.text = resources.getString(R.string.insert_a_value)
                 }
                 R.id.btnPlay -> {
                     if (statePlayer == STOP) {
@@ -71,9 +73,11 @@ class MainFragment : Fragment() {
                     viewModel.startAlgo()
                 }
                 R.id.btnPrevious ->{
+                    tvState.text = resources.getString(R.string.insert_a_value)
                     viewModel.setPreviousState()
                 }
                 R.id.btnNext ->{
+                    tvState.text = resources.getString(R.string.insert_a_value)
                     viewModel.setNextState()
                 }
             }
