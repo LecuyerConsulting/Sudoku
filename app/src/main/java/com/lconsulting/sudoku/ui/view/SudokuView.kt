@@ -61,7 +61,7 @@ class SudokuView : GridLayout {
         unSelectSquare()
     }
 
-    fun selectSquares(listSquareSelected: List<Pair<Int, Int>>, listValueSelected: List<Int>, idResColor : Int) {
+    fun selectSquare(listSquareSelected: List<Pair<Int, Int>>, listValueSelected: List<Int>, idResColor : Int) {
         listSquareSelected.forEach {
             val grid = listGridView[it.first]
             listGridViewSelected.add(grid)

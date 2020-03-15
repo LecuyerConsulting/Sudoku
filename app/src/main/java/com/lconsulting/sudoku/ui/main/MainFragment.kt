@@ -34,22 +34,30 @@ class MainFragment : Fragment() {
     @StateResolver
     private var statePlayer = PLAY
 
-    private var idGrid: Int = 0
-    private var idSquare: Int = 0
+    private var idGrid: Int = -1
+    private var idSquare: Int = -1
     private var isRepeat: Boolean = false
 
     private val onClickListener = View.OnClickListener { v ->
         when (v) {
             is Button -> {
-//                sudoku.unEnlightenedValue()
-//                sudoku.enlightenedValue(v.text.toString().toInt())
-                viewModel.insertValueByUser(v.text.toString(), idGrid, idSquare)
-                disableDigitsButton()
+                if(idGrid == -1 && idSquare == -1){
+                    sudoku.unEnlightenedValue()
+                    sudoku.enlightenedValue(v.text.toString().toInt())
+                }else {
+                    viewModel.insertValueByUser(v.text.toString(), idGrid, idSquare)
+                    enableDigitsButton(true)
+                    idGrid = -1
+                    idSquare = -1
+                }
             }
             else -> when (v.id) {
                 R.id.main ->{
-//                    sudoku.unEnlightenedValue()
-//                    sudoku.unSelectSquare()
+                    sudoku.unEnlightenedValue()
+                    sudoku.unSelectSquare()
+                    enableDigitsButton(true)
+                    idGrid = -1
+                    idSquare = -1
                 }
                 R.id.btnPlay -> {
                     if (statePlayer == STOP) {
@@ -106,7 +114,7 @@ class MainFragment : Fragment() {
 
         main.setOnClickListener(onClickListener)
 
-        disableDigitsButton()
+        enableDigitsButton(true)
         hideActionButton()
     }
 
@@ -230,8 +238,8 @@ class MainFragment : Fragment() {
                     else -> resources.getString(state.idRes, listValueSelected[0])
                 }
 
-                sudoku.selectSquares(state.listSquareSelectedToKeep, listValueSelected, R.color.colorValueFound)
-                sudoku.selectSquares(state.listSquareSelectedToRemove, listValueSelected, R.color.colorValueRemove)
+                sudoku.selectSquare(state.listSquareSelectedToKeep, listValueSelected, R.color.colorValueFound)
+                sudoku.selectSquare(state.listSquareSelectedToRemove, listValueSelected, R.color.colorValueRemove)
                 handler(state.sudoku)
             }
             is SudokuState.Reset -> {
@@ -243,19 +251,6 @@ class MainFragment : Fragment() {
                 tvState.text = resources.getString(state.idResString)
             }
             is SudokuState.DisplayButton -> updateDigitsButton(state.possibility)
-//            is SudokuState.PairAlgo -> {
-//                sudoku.selectSquares(state.listSquareSelectedToKeep, state.listValueSelected, R.color.colorValueFound)
-//                sudoku.selectSquares(state.listSquareSelectedToRemove, state.listValueSelected, R.color.colorValueRemove)
-//                val listValues = state.listValueSelected.toList()
-//                tvState.text = resources.getString(state.idRes, listValues[0], listValues[1])
-//                handler(state.sudoku)
-//            }
-//            is SudokuState.IntersectionAlgo -> {
-//                sudoku.selectSquare(state.listSquareSelectedToKeep, state.value, R.color.colorValueFound)
-//                sudoku.selectSquare(state.listSquareSelectedToRemove, state.value, R.color.colorValueRemove)
-//                tvState.text = resources.getString(state.idRes, state.value)
-//                handler(state.sudoku)
-//            }
         }
     }
 
@@ -274,10 +269,10 @@ class MainFragment : Fragment() {
         this.isRepeat = isRepeat
     }
 
-    private fun disableDigitsButton() {
+    private fun enableDigitsButton(isEnabled : Boolean) {
         llButton.forEach {
             val tv = it as TextView
-            tv.isEnabled = false
+            tv.isEnabled = isEnabled
         }
     }
 
