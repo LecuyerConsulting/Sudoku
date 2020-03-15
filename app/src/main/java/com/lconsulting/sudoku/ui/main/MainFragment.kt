@@ -41,10 +41,10 @@ class MainFragment : Fragment() {
     private val onClickListener = View.OnClickListener { v ->
         when (v) {
             is Button -> {
-                if(idGrid == -1 && idSquare == -1){
+                if (idGrid == -1 && idSquare == -1) {
                     sudoku.unEnlightenedValue()
                     sudoku.enlightenedValue(v.text.toString().toInt())
-                }else {
+                } else {
                     viewModel.insertValueByUser(v.text.toString(), idGrid, idSquare)
                     enableDigitsButton(true)
                     idGrid = -1
@@ -52,7 +52,7 @@ class MainFragment : Fragment() {
                 }
             }
             else -> when (v.id) {
-                R.id.main ->{
+                R.id.main -> {
                     sudoku.unEnlightenedValue()
                     sudoku.unSelectSquare()
                     enableDigitsButton(true)
@@ -69,6 +69,12 @@ class MainFragment : Fragment() {
                 R.id.btnRepeat -> {
                     setRepeatMode(STOP, R.drawable.baseline_stop_black_24, true)
                     viewModel.startAlgo()
+                }
+                R.id.btnPrevious ->{
+                    viewModel.setPreviousState()
+                }
+                R.id.btnNext ->{
+                    viewModel.setNextState()
                 }
             }
         }
@@ -120,98 +126,96 @@ class MainFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.insertValueByUser("0",0, 0)
-        viewModel.insertValueByUser("4",0, 1)
-        viewModel.insertValueByUser("6",0, 2)
-        viewModel.insertValueByUser("0",0, 3)
-        viewModel.insertValueByUser("8",0, 4)
-        viewModel.insertValueByUser("1",0, 5)
-        viewModel.insertValueByUser("7",0, 6)
-        viewModel.insertValueByUser("5",0, 7)
-        viewModel.insertValueByUser("2",0, 8)
+//        viewModel.insertValueByUser("0",0, 0)
+//        viewModel.insertValueByUser("4",0, 1)
+//        viewModel.insertValueByUser("6",0, 2)
+//        viewModel.insertValueByUser("0",0, 3)
+//        viewModel.insertValueByUser("8",0, 4)
+//        viewModel.insertValueByUser("1",0, 5)
+//        viewModel.insertValueByUser("7",0, 6)
+//        viewModel.insertValueByUser("5",0, 7)
+//        viewModel.insertValueByUser("2",0, 8)
+//
+//        viewModel.insertValueByUser("7",1, 0)
+//        viewModel.insertValueByUser("2",1, 1)
+//        viewModel.insertValueByUser("0",1, 2)
+//        viewModel.insertValueByUser("6",1, 3)
+//        viewModel.insertValueByUser("4",1, 4)
+//        viewModel.insertValueByUser("0",1, 5)
+//        viewModel.insertValueByUser("1",1, 6)
+//        viewModel.insertValueByUser("8",1, 7)
+//        viewModel.insertValueByUser("3",1, 8)
+//
+//        viewModel.insertValueByUser("0",2, 0)
+//        viewModel.insertValueByUser("0",2, 1)
+//        viewModel.insertValueByUser("8",2, 2)
+//        viewModel.insertValueByUser("2",2, 3)
+//        viewModel.insertValueByUser("0",2, 4)
+//        viewModel.insertValueByUser("0",2, 5)
+//        viewModel.insertValueByUser("6",2, 6)
+//        viewModel.insertValueByUser("9",2, 7)
+//        viewModel.insertValueByUser("4",2, 8)
+//
+//        viewModel.insertValueByUser("8",3, 0)
+//        viewModel.insertValueByUser("9",3, 1)
+//        viewModel.insertValueByUser("7",3, 2)
+//        viewModel.insertValueByUser("5",3, 3)
+//        viewModel.insertValueByUser("0",3, 4)
+//        viewModel.insertValueByUser("4",3, 5)
+//        viewModel.insertValueByUser("2",3, 6)
+//        viewModel.insertValueByUser("0",3, 7)
+//        viewModel.insertValueByUser("3",3, 8)
+//
+//        viewModel.insertValueByUser("2",4, 0)
+//        viewModel.insertValueByUser("5",4, 1)
+//        viewModel.insertValueByUser("0",4, 2)
+//        viewModel.insertValueByUser("3",4, 3)
+//        viewModel.insertValueByUser("9",4, 4)
+//        viewModel.insertValueByUser("0",4, 5)
+//        viewModel.insertValueByUser("4",4, 6)
+//        viewModel.insertValueByUser("0",4, 7)
+//        viewModel.insertValueByUser("8",4, 8)
+//
+//        viewModel.insertValueByUser("0",5, 0)
+//        viewModel.insertValueByUser("4",5, 1)
+//        viewModel.insertValueByUser("0",5, 2)
+//        viewModel.insertValueByUser("8",5, 3)
+//        viewModel.insertValueByUser("2",5, 4)
+//        viewModel.insertValueByUser("0",5, 5)
+//        viewModel.insertValueByUser("0",5, 6)
+//        viewModel.insertValueByUser("0",5, 7)
+//        viewModel.insertValueByUser("9",5, 8)
+//
+//        viewModel.insertValueByUser("0",6, 0)
+//        viewModel.insertValueByUser("7",6, 1)
+//        viewModel.insertValueByUser("9",6, 2)
+//        viewModel.insertValueByUser("4",6, 3)
+//        viewModel.insertValueByUser("3",6, 4)
+//        viewModel.insertValueByUser("5",6, 5)
+//        viewModel.insertValueByUser("0",6, 6)
+//        viewModel.insertValueByUser("2",6, 7)
+//        viewModel.insertValueByUser("8",6, 8)
+//
+//        viewModel.insertValueByUser("8",7, 0)
+//        viewModel.insertValueByUser("0",7, 1)
+//        viewModel.insertValueByUser("2",7, 2)
+//        viewModel.insertValueByUser("9",7, 3)
+//        viewModel.insertValueByUser("0",7, 4)
+//        viewModel.insertValueByUser("0",7, 5)
+//        viewModel.insertValueByUser("5",7, 6)
+//        viewModel.insertValueByUser("3",7, 7)
+//        viewModel.insertValueByUser("4",7, 8)
+//
+//        viewModel.insertValueByUser("4",8, 0)
+//        viewModel.insertValueByUser("3",8, 1)
+//        viewModel.insertValueByUser("5",8, 2)
+//        viewModel.insertValueByUser("0",8, 3)
+//        viewModel.insertValueByUser("8",8, 4)
+//        viewModel.insertValueByUser("2",8, 5)
+//        viewModel.insertValueByUser("9",8, 6)
+//        viewModel.insertValueByUser("0",8, 7)
+//        viewModel.insertValueByUser("0",8, 8)
 
-        viewModel.insertValueByUser("7",1, 0)
-        viewModel.insertValueByUser("2",1, 1)
-        viewModel.insertValueByUser("0",1, 2)
-        viewModel.insertValueByUser("6",1, 3)
-        viewModel.insertValueByUser("4",1, 4)
-        viewModel.insertValueByUser("0",1, 5)
-        viewModel.insertValueByUser("1",1, 6)
-        viewModel.insertValueByUser("8",1, 7)
-        viewModel.insertValueByUser("3",1, 8)
-
-        viewModel.insertValueByUser("0",2, 0)
-        viewModel.insertValueByUser("0",2, 1)
-        viewModel.insertValueByUser("8",2, 2)
-        viewModel.insertValueByUser("2",2, 3)
-        viewModel.insertValueByUser("0",2, 4)
-        viewModel.insertValueByUser("0",2, 5)
-        viewModel.insertValueByUser("6",2, 6)
-        viewModel.insertValueByUser("9",2, 7)
-        viewModel.insertValueByUser("4",2, 8)
-
-        viewModel.insertValueByUser("8",3, 0)
-        viewModel.insertValueByUser("9",3, 1)
-        viewModel.insertValueByUser("7",3, 2)
-        viewModel.insertValueByUser("5",3, 3)
-        viewModel.insertValueByUser("0",3, 4)
-        viewModel.insertValueByUser("4",3, 5)
-        viewModel.insertValueByUser("2",3, 6)
-        viewModel.insertValueByUser("0",3, 7)
-        viewModel.insertValueByUser("3",3, 8)
-
-        viewModel.insertValueByUser("2",4, 0)
-        viewModel.insertValueByUser("5",4, 1)
-        viewModel.insertValueByUser("0",4, 2)
-        viewModel.insertValueByUser("3",4, 3)
-        viewModel.insertValueByUser("9",4, 4)
-        viewModel.insertValueByUser("0",4, 5)
-        viewModel.insertValueByUser("4",4, 6)
-        viewModel.insertValueByUser("0",4, 7)
-        viewModel.insertValueByUser("8",4, 8)
-
-        viewModel.insertValueByUser("0",5, 0)
-        viewModel.insertValueByUser("4",5, 1)
-        viewModel.insertValueByUser("0",5, 2)
-        viewModel.insertValueByUser("8",5, 3)
-        viewModel.insertValueByUser("2",5, 4)
-        viewModel.insertValueByUser("0",5, 5)
-        viewModel.insertValueByUser("0",5, 6)
-        viewModel.insertValueByUser("0",5, 7)
-        viewModel.insertValueByUser("9",5, 8)
-
-        viewModel.insertValueByUser("0",6, 0)
-        viewModel.insertValueByUser("7",6, 1)
-        viewModel.insertValueByUser("9",6, 2)
-        viewModel.insertValueByUser("4",6, 3)
-        viewModel.insertValueByUser("3",6, 4)
-        viewModel.insertValueByUser("5",6, 5)
-        viewModel.insertValueByUser("0",6, 6)
-        viewModel.insertValueByUser("2",6, 7)
-        viewModel.insertValueByUser("8",6, 8)
-
-        viewModel.insertValueByUser("8",7, 0)
-        viewModel.insertValueByUser("0",7, 1)
-        viewModel.insertValueByUser("2",7, 2)
-        viewModel.insertValueByUser("9",7, 3)
-        viewModel.insertValueByUser("0",7, 4)
-        viewModel.insertValueByUser("0",7, 5)
-        viewModel.insertValueByUser("5",7, 6)
-        viewModel.insertValueByUser("3",7, 7)
-        viewModel.insertValueByUser("4",7, 8)
-
-        viewModel.insertValueByUser("4",8, 0)
-        viewModel.insertValueByUser("3",8, 1)
-        viewModel.insertValueByUser("5",8, 2)
-        viewModel.insertValueByUser("0",8, 3)
-        viewModel.insertValueByUser("8",8, 4)
-        viewModel.insertValueByUser("2",8, 5)
-        viewModel.insertValueByUser("9",8, 6)
-        viewModel.insertValueByUser("0",8, 7)
-        viewModel.insertValueByUser("0",8, 8)
-
-//        isRepeat = true
-//        viewModel.startAlgo()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -230,16 +234,29 @@ class MainFragment : Fragment() {
             is SudokuState.FillSquare -> {
                 sudoku.updateSudoku(state.sudoku)
                 tvState.text = resources.getString(state.idRes, state.value)
+                displayActionButton(state.isFirstItem, state.isLastItem)
             }
             is SudokuState.SuccessAlgo -> {
                 val listValueSelected = state.listValueSelected.toList()
-                tvState.text =  when(state.listValueSelected.size){
-                    2 -> resources.getString(state.idRes, listValueSelected[0], listValueSelected[1])
+                tvState.text = when (state.listValueSelected.size) {
+                    2 -> resources.getString(
+                        state.idRes,
+                        listValueSelected[0],
+                        listValueSelected[1]
+                    )
                     else -> resources.getString(state.idRes, listValueSelected[0])
                 }
 
-                sudoku.selectSquare(state.listSquareSelectedToKeep, listValueSelected, R.color.colorValueFound)
-                sudoku.selectSquare(state.listSquareSelectedToRemove, listValueSelected, R.color.colorValueRemove)
+                sudoku.selectSquare(
+                    state.listSquareSelectedToKeep,
+                    listValueSelected,
+                    R.color.colorValueFound
+                )
+                sudoku.selectSquare(
+                    state.listSquareSelectedToRemove,
+                    listValueSelected,
+                    R.color.colorValueRemove
+                )
                 handler(state.sudoku)
             }
             is SudokuState.Reset -> {
@@ -251,6 +268,10 @@ class MainFragment : Fragment() {
                 tvState.text = resources.getString(state.idResString)
             }
             is SudokuState.DisplayButton -> updateDigitsButton(state.possibility)
+            is SudokuState.RestoreState ->{
+                sudoku.updateSudoku(state.sudoku)
+                displayActionButton(state.isFirstItem, state.isLastItem)
+            }
         }
     }
 
@@ -269,7 +290,7 @@ class MainFragment : Fragment() {
         this.isRepeat = isRepeat
     }
 
-    private fun enableDigitsButton(isEnabled : Boolean) {
+    private fun enableDigitsButton(isEnabled: Boolean) {
         llButton.forEach {
             val tv = it as TextView
             tv.isEnabled = isEnabled
@@ -279,6 +300,20 @@ class MainFragment : Fragment() {
     private fun hideActionButton() {
         btnPrevious.visibility = View.INVISIBLE
         btnNext.visibility = View.INVISIBLE
+    }
+
+    private fun displayActionButton(firstItem: Boolean, lastItem: Boolean) {
+        btnPrevious.visibility = if (firstItem) {
+            View.INVISIBLE
+        } else {
+            View.VISIBLE
+        }
+
+        btnNext.visibility = if (lastItem) {
+            View.INVISIBLE
+        } else {
+            View.VISIBLE
+        }
     }
 
     private fun updateDigitsButton(possibility: MutableSet<Int>) {

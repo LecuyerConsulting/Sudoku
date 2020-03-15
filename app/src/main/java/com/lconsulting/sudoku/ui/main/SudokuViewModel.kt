@@ -4,11 +4,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.lconsulting.sudoku.R
 import com.lconsulting.sudoku.data.SquareData
+import com.lconsulting.sudoku.memento.Caretaker
+import com.lconsulting.sudoku.memento.Originator
 
 
 sealed class SudokuState {
     class FillSquare(
-        val sudoku: Array<SquareData>, val idRes: Int, val value: Int
+        val sudoku: Array<SquareData>, val idRes: Int, val value: Int,
+        val isFirstItem: Boolean, val isLastItem: Boolean
     ) : SudokuState()
 
     class SuccessAlgo(
@@ -17,6 +20,11 @@ sealed class SudokuState {
         val listValueSelected: Set<Int>,
         val listSquareSelectedToKeep: List<Pair<Int, Int>>,
         val listSquareSelectedToRemove: List<Pair<Int, Int>>
+    ) : SudokuState()
+
+    class RestoreState(
+        val sudoku: Array<SquareData>,
+        val isFirstItem: Boolean, val isLastItem: Boolean
     ) : SudokuState()
 
     class DisplayButton(val possibility: MutableSet<Int>) : SudokuState()
@@ -46,6 +54,9 @@ sealed class SudokuState {
 
 open class SudokuViewModel : ViewModel() {
 
+    private val caretaker: Caretaker = Caretaker()
+    private val originator: Originator = Originator()
+
     val state = MutableLiveData<SudokuState>()
 
     private var digitsToFind = 81
@@ -59,6 +70,8 @@ open class SudokuViewModel : ViewModel() {
         digitsToFind = 81
         sudoku = Array(81) { SquareData() }
         state.postValue(SudokuState.Reset(sudoku))
+        caretaker.clearMemento()
+        originator.clearState()
     }
 
     /**
@@ -84,29 +97,61 @@ open class SudokuViewModel : ViewModel() {
      */
     fun insertValueByUser(sValue: String, idGrid: Int, idSquare: Int) {
         if (sValue != "0") {
-            val pos = getIndex(idGrid, idSquare)
+            val index = getIndex(idGrid, idSquare)
 
             val newValue = sValue.toInt()
-            val oldValue = sudoku[pos].value
+            val oldValue = sudoku[index].value
 
             if (oldValue != 0) {
-                updateDigitsAvailable(oldValue, getStartIndexColumn(pos), ::getIndexInColumn, ::add)
-                updateDigitsAvailable(oldValue, getStartIndexRow(pos), ::getIndexInRow, ::add)
-                updateDigitsAvailable(oldValue, getStartIndexGrid(pos), ::getIndexInGrid, ::add)
-                sudoku[pos].value = 0
-                digitsToFind++
+                removeValue(oldValue, index)
             }
 
-            insertValue(newValue, R.color.colorValue, pos)
+            addValue(newValue, R.color.colorValue, index)
+
+            saveState(newValue, idGrid, idSquare, R.color.colorValue)
 
             state.postValue(
                 SudokuState.FillSquare(
                     sudoku,
                     R.string.insert_value,
-                    newValue
+                    newValue,
+                    caretaker.isFirstItem(),
+                    caretaker.isLastItem()
                 )
             )
         }
+    }
+
+    /**
+     * save state with memento pattern
+     *
+     * @param value
+     * @param idGrid
+     * @param idSquare
+     */
+    private fun saveState(value: Int, idGrid: Int, idSquare: Int, idResColor : Int) {
+        originator.setState(idGrid, idSquare, value, idResColor)
+        caretaker.addMemento(originator.save())
+    }
+
+    /**
+     * get the previous memento and refresh sudoku
+     */
+    fun setPreviousState() {
+        val memento = caretaker.getMemento(-1)
+        removeValue(memento.value, getIndex(memento.idGrid, memento.idSquare))
+        state.postValue(SudokuState.RestoreState(sudoku, caretaker.isFirstItem(),
+            caretaker.isLastItem()))
+    }
+
+    /**
+     * get the next memento and refresh sudoku
+     */
+    fun setNextState() {
+        val memento = caretaker.getMemento(+1)
+        addValue(memento.value, memento.idResColor, getIndex(memento.idGrid, memento.idSquare))
+        state.postValue(SudokuState.RestoreState(sudoku, caretaker.isFirstItem(),
+            caretaker.isLastItem()))
     }
 
     /**
@@ -309,14 +354,14 @@ open class SudokuViewModel : ViewModel() {
     }
 
     /**
-     * insert value in sudoku
+     * add value in sudoku
      * and update other squares in the same row, column and grid
      *
      * @param value value to put in the square
      * @param idTextColor id ressource for textColor
-     * @param index square index who will get the value
+     * @param index square index where we add the value
      */
-    private fun insertValue(value: Int, idTextColor: Int, index: Int) {
+    private fun addValue(value: Int, idTextColor: Int, index: Int) {
         sudoku[index].apply {
             this.value = value
             this.idTextColor = idTextColor
@@ -325,6 +370,22 @@ open class SudokuViewModel : ViewModel() {
         updateDigitsAvailable(value, getStartIndexGrid(index), ::getIndexInGrid, ::remove)
         updateDigitsAvailable(value, getStartIndexRow(index), ::getIndexInRow, ::remove)
         updateDigitsAvailable(value, getStartIndexColumn(index), ::getIndexInColumn, ::remove)
+    }
+
+    /**
+     * remove value in sudoku
+     * and update other squares in the same row, column and grid
+     *
+     * @param value value to remove in the square
+     * @param index square index where we remove the value
+     */
+    private fun removeValue(value : Int, index : Int){
+        sudoku[index].value = 0
+        digitsToFind++
+        updateDigitsAvailable(value, getStartIndexColumn(index), ::getIndexInColumn, ::add)
+        updateDigitsAvailable(value, getStartIndexRow(index), ::getIndexInRow, ::add)
+        updateDigitsAvailable(value, getStartIndexGrid(index), ::getIndexInGrid, ::add)
+
     }
 
     /**
@@ -380,7 +441,7 @@ open class SudokuViewModel : ViewModel() {
         for (index in sudoku.indices) {
             if (sudoku[index].value == 0 && sudoku[index].possibility.size == 1) {
                 val value = sudoku[index].possibility.toList()[0]
-                insertValue(value, R.color.colorValueFound, index)
+                addValue(value, R.color.colorValueFound, index)
 
                 val setIndexSelectedToRemove = getImpactedIndex(
                     index, checkGrid = true,
@@ -488,7 +549,7 @@ open class SudokuViewModel : ViewModel() {
             if (tabCompteur[i].size == 1) {
                 val value = i + 1
                 val index = tabCompteur[i].toList()[0]
-                insertValue(value, R.color.colorValueFound, index)
+                addValue(value, R.color.colorValueFound, index)
 
                 val setIndexSelectedToRemove = getImpactedIndex(
                     index, checkGrid = true,
@@ -592,16 +653,20 @@ open class SudokuViewModel : ViewModel() {
                 if (checkPairByGrid(index)) {
                     return true
                 }
-                if (checkPairBy(index, getStartIndexRow(index), ::getIndexInRow,
+                if (checkPairBy(
+                        index, getStartIndexRow(index), ::getIndexInRow,
                         isColunm = false,
                         isRow = true
-                    )) {
+                    )
+                ) {
                     return true
                 }
-                if (checkPairBy(index, getStartIndexColumn(index), ::getIndexInColumn,
+                if (checkPairBy(
+                        index, getStartIndexColumn(index), ::getIndexInColumn,
                         isColunm = true,
                         isRow = false
-                    )) {
+                    )
+                ) {
                     return true
                 }
             }
