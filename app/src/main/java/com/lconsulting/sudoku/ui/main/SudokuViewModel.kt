@@ -123,6 +123,18 @@ open class SudokuViewModel : ViewModel() {
     }
 
     /**
+     * if digits to find is 0, sudoku is solved
+     * else we search value
+     */
+    fun startAlgo() {
+        if (digitsToFind == 0) {
+            state.postValue(SudokuState.DisplayMessage(R.string.success_sudoku))
+        } else if (!searchValue()) {
+            state.postValue(SudokuState.DisplayMessage(R.string.error_sudoku))
+        }
+    }
+
+    /**
      * save state with memento pattern
      *
      * @param value
@@ -160,18 +172,6 @@ open class SudokuViewModel : ViewModel() {
                 caretaker.isLastItem()
             )
         )
-    }
-
-    /**
-     * if digits to find is 0, sudoku is solved
-     * else we search value
-     */
-    fun startAlgo() {
-        if (digitsToFind == 0) {
-            state.postValue(SudokuState.DisplayMessage(R.string.success_sudoku))
-        } else if (!searchValue()) {
-            state.postValue(SudokuState.DisplayMessage(R.string.error_sudoku))
-        }
     }
 
     /**
@@ -394,6 +394,14 @@ open class SudokuViewModel : ViewModel() {
         updateDigitsAvailable(value, getStartIndexRow(index), ::getIndexInRow, ::add)
         updateDigitsAvailable(value, getStartIndexGrid(index), ::getIndexInGrid, ::add)
 
+        for (i in sudoku.indices){
+            val v = sudoku[i].value
+            if(v != 0 ){
+                updateDigitsAvailable(v, getStartIndexGrid(i), ::getIndexInGrid, ::remove)
+                updateDigitsAvailable(v, getStartIndexRow(i), ::getIndexInRow, ::remove)
+                updateDigitsAvailable(v, getStartIndexColumn(i), ::getIndexInColumn, ::remove)
+            }
+        }
     }
 
     /**
@@ -676,7 +684,7 @@ open class SudokuViewModel : ViewModel() {
                         index, getStartIndexRow(index), ::getIndexInRow,
                         isColunm = false,
                         isRow = true,
-                        R.string.pair_found_row
+                        idResString = R.string.pair_found_row
                     )
                 ) {
                     return true
@@ -685,7 +693,7 @@ open class SudokuViewModel : ViewModel() {
                         index, getStartIndexColumn(index), ::getIndexInColumn,
                         isColunm = true,
                         isRow = false,
-                        R.string.pair_found_coloumn
+                        idResString = R.string.pair_found_coloumn
                     )
                 ) {
                     return true

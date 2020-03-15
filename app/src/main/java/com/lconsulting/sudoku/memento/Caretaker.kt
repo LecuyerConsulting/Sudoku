@@ -1,20 +1,16 @@
 package com.lconsulting.sudoku.memento
 
-import android.util.Log
-
 class Caretaker {
     private val listMemento = mutableListOf<Memento>()
     private var position = 0
 
     fun addMemento(memento: Memento) {
         listMemento.add(position, memento)
-        Log.d("tom971", "before ${listMemento.toString()}")
         position++
         if (position < listMemento.size) {
-            for (index in listMemento.size-1 downTo position) {
+            for (index in listMemento.size - 1 downTo position) {
                 listMemento.removeAt(index)
             }
-            Log.d("tom971", " after ${listMemento.toString()}")
         }
     }
 
@@ -29,6 +25,7 @@ class Caretaker {
     }
 
     fun clearMemento() {
+        position = 0
         listMemento.clear()
     }
 
