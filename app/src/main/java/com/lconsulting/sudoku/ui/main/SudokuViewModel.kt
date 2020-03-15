@@ -129,7 +129,7 @@ open class SudokuViewModel : ViewModel() {
      * @param idGrid
      * @param idSquare
      */
-    private fun saveState(value: Int, idGrid: Int, idSquare: Int, idResColor : Int) {
+    private fun saveState(value: Int, idGrid: Int, idSquare: Int, idResColor: Int) {
         originator.setState(idGrid, idSquare, value, idResColor)
         caretaker.addMemento(originator.save())
     }
@@ -140,8 +140,12 @@ open class SudokuViewModel : ViewModel() {
     fun setPreviousState() {
         val memento = caretaker.getMemento(-1)
         removeValue(memento.value, getIndex(memento.idGrid, memento.idSquare))
-        state.postValue(SudokuState.RestoreState(sudoku, caretaker.isFirstItem(),
-            caretaker.isLastItem()))
+        state.postValue(
+            SudokuState.RestoreState(
+                sudoku, caretaker.isFirstItem(),
+                caretaker.isLastItem()
+            )
+        )
     }
 
     /**
@@ -150,8 +154,12 @@ open class SudokuViewModel : ViewModel() {
     fun setNextState() {
         val memento = caretaker.getMemento(+1)
         addValue(memento.value, memento.idResColor, getIndex(memento.idGrid, memento.idSquare))
-        state.postValue(SudokuState.RestoreState(sudoku, caretaker.isFirstItem(),
-            caretaker.isLastItem()))
+        state.postValue(
+            SudokuState.RestoreState(
+                sudoku, caretaker.isFirstItem(),
+                caretaker.isLastItem()
+            )
+        )
     }
 
     /**
@@ -379,7 +387,7 @@ open class SudokuViewModel : ViewModel() {
      * @param value value to remove in the square
      * @param index square index where we remove the value
      */
-    private fun removeValue(value : Int, index : Int){
+    private fun removeValue(value: Int, index: Int) {
         sudoku[index].value = 0
         digitsToFind++
         updateDigitsAvailable(value, getStartIndexColumn(index), ::getIndexInColumn, ::add)
@@ -442,6 +450,12 @@ open class SudokuViewModel : ViewModel() {
             if (sudoku[index].value == 0 && sudoku[index].possibility.size == 1) {
                 val value = sudoku[index].possibility.toList()[0]
                 addValue(value, R.color.colorValueFound, index)
+                saveState(
+                    value,
+                    getIndexGrid(index),
+                    getIndexSquareInGrid(index),
+                    R.color.colorValueFound
+                )
 
                 val setIndexSelectedToRemove = getImpactedIndex(
                     index, checkGrid = true,
@@ -550,7 +564,12 @@ open class SudokuViewModel : ViewModel() {
                 val value = i + 1
                 val index = tabCompteur[i].toList()[0]
                 addValue(value, R.color.colorValueFound, index)
-
+                saveState(
+                    value,
+                    getIndexGrid(index),
+                    getIndexSquareInGrid(index),
+                    R.color.colorValueFound
+                )
                 val setIndexSelectedToRemove = getImpactedIndex(
                     index, checkGrid = true,
                     checkColumn = true, checkRow = true
