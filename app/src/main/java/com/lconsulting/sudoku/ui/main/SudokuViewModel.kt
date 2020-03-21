@@ -527,7 +527,7 @@ open class SudokuViewModel : ViewModel() {
      * if square is found, update view
      *
      * @param idRes id String to explain result
-     *
+     * @param getIndexIn getIndexInGrid | getIndexInRow | getIndexInColunm
      * @return true if square is found else false
      */
     private fun checkOneValue9Time(
@@ -977,7 +977,7 @@ open class SudokuViewModel : ViewModel() {
      * compute the first square index of row with position
      *
      * @param position in [0,8]
-     * @return one value in this set {0, 9, 18, 36, 45, 54, 63, 72}
+     * @return one value in this set {0, 9, 18, 27, 36, 45, 54, 63, 72}
      */
     private fun getStartIndexRowByPosition(position: Int): Int = position * 9
 
