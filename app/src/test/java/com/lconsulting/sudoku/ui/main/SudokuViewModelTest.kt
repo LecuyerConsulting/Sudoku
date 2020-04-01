@@ -289,26 +289,26 @@ object SudokuViewModelTest : Spek({
         }
     }
 
-//    describe("removeValuePair") {
-//        before {
-//
-//        }
-//        listOf(
-//            0 to 0,
-//            4 to 4,
-//            6 to 6
-//        ).forEach {
-//            it("remove value from indexPair on index") {
-//                val method = viewModel.javaClass.getDeclaredMethod("removeValuePair", Int::class.java, Int::class.java)
-//                method.isAccessible = true
-//                val parameters = arrayOfNulls<Any>(1)
-//                parameters[0] = it.first
-//                parameters[1] = it.second
-//                val result = method.invoke(viewModel, *parameters) as Boolean
-//                assertEquals(it.second, result)
-//            }
-//        }
-//    }
+    describe("removeValuePair") {
+        before {
+
+        }
+        listOf(
+            0 to 0,
+            4 to 4,
+            6 to 6
+        ).forEach {
+            it("remove value from indexPair on index") {
+                val method = viewModel.javaClass.getDeclaredMethod("removeValuePair", Int::class.java, Int::class.java)
+                method.isAccessible = true
+                val parameters = arrayOfNulls<Any>(1)
+                parameters[0] = it.first
+                parameters[1] = it.second
+                val result = method.invoke(viewModel, *parameters) as Boolean
+                assertEquals(it.second, result)
+            }
+        }
+    }
 
 
 })
