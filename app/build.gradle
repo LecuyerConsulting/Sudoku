@@ -2,7 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'org.jetbrains.dokka-android'
-apply plugin: "de.mannodermaus.android-junit5"
+apply plugin: 'de.mannodermaus.android-junit5'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29

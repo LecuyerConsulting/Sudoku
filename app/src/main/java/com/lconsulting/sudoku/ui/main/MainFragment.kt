@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.lconsulting.sudoku.R
 import com.lconsulting.sudoku.data.SquareData
+import com.lconsulting.sudoku.data.Sudoku
 import com.lconsulting.sudoku.ui.view.SudokuView
 import kotlinx.android.synthetic.main.main_fragment.*
 
@@ -96,6 +97,7 @@ class MainFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(SudokuViewModel::class.java)
+        viewModel.sudokuData = Sudoku()
         viewModel.state.observe(this, Observer { updateUI(it) })
     }
 
