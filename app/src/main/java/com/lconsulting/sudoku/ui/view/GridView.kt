@@ -12,12 +12,12 @@ import com.lconsulting.sudoku.data.SquareData
 class GridView : GridLayout {
 
     private var onGridListener: OnGridListener? = null
-    private val listSquareView: MutableList<SqareView> = mutableListOf()
-    private val listSquareViewSelected: MutableList<SqareView> = mutableListOf()
+    private val listSquareView: MutableList<ISquareView> = mutableListOf()
+    private val listSquareViewSelected: MutableList<ISquareView> = mutableListOf()
 
     private val onClickListener = OnClickListener { v ->
         when (v) {
-            is SqareView -> {
+            is ISquareView -> {
                 unSelectedSquare()
                 listSquareViewSelected.add(v)
                 v.selectSquare()
@@ -39,7 +39,7 @@ class GridView : GridLayout {
         columnCount = 3
 
         forEach {
-            listSquareView.add(it as SqareView)
+            listSquareView.add(it as ISquareView)
             it.setOnClickListener(onClickListener)
         }
     }
