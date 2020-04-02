@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.lconsulting.sudoku.R
 import com.lconsulting.sudoku.data.SquareData
-import com.lconsulting.sudoku.data.Sudoku
+import com.lconsulting.sudoku.data.SudokuData
 import com.lconsulting.sudoku.memento.Caretaker
 import com.lconsulting.sudoku.memento.Originator
 
@@ -61,7 +61,7 @@ class SudokuViewModel : ViewModel() {
 
     val state = MutableLiveData<SudokuState>()
 
-    lateinit var sudokuData : Sudoku
+    lateinit var sudokuData : SudokuData
 
     /**
      * reset sudoku to default values

@@ -76,4 +76,7 @@ dependencies {
 
     testImplementation "org.spekframework.spek2:spek-dsl-jvm:2.0.7"
     testImplementation "org.spekframework.spek2:spek-runner-junit5:2.0.7"
+
+    implementation 'com.google.dagger:dagger:2.21'
+    kapt 'com.google.dagger:dagger-compiler:2.21'
 }

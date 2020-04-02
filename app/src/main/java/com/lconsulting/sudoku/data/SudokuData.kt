@@ -1,6 +1,8 @@
 package com.lconsulting.sudoku.data
 
-class Sudoku {
+import javax.inject.Inject
+
+class SudokuData @Inject constructor(){
 
     val SIZE : Int = 81
 
@@ -21,7 +23,7 @@ class Sudoku {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Sudoku
+        other as SudokuData
 
         if (digitsToFind != other.digitsToFind) return false
         if (!sudoku.contentEquals(other.sudoku)) return false

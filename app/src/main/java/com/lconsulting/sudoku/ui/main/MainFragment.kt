@@ -1,5 +1,6 @@
 package com.lconsulting.sudoku.ui.main
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -11,11 +12,13 @@ import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.lconsulting.sudoku.MyApplication
 import com.lconsulting.sudoku.R
 import com.lconsulting.sudoku.data.SquareData
-import com.lconsulting.sudoku.data.Sudoku
+import com.lconsulting.sudoku.data.SudokuData
 import com.lconsulting.sudoku.ui.view.SudokuView
 import kotlinx.android.synthetic.main.main_fragment.*
+import javax.inject.Inject
 
 class MainFragment : Fragment() {
 
@@ -32,6 +35,7 @@ class MainFragment : Fragment() {
     }
 
     private lateinit var viewModel: SudokuViewModel
+    @Inject lateinit var sudokuData: SudokuData
 
     @StateResolver
     private var statePlayer = PLAY
@@ -94,11 +98,9 @@ class MainFragment : Fragment() {
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(SudokuViewModel::class.java)
-        viewModel.sudokuData = Sudoku()
-        viewModel.state.observe(this, Observer { updateUI(it) })
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (activity?.applicationContext as MyApplication).appComponent.inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,7 +117,6 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         llButton.forEach {
             it.setOnClickListener(onClickListener)
         }
@@ -129,6 +130,14 @@ class MainFragment : Fragment() {
 
         enableDigitsButton(true)
         hideActionButton()
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        viewModel = ViewModelProviders.of(this).get(SudokuViewModel::class.java)
+        viewModel.sudokuData = sudokuData
+        viewModel.state.observe(this, Observer { updateUI(it) })
     }
 
     override fun onStart() {

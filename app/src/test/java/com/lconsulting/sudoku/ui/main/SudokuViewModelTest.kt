@@ -1,6 +1,6 @@
 package com.lconsulting.sudoku.ui.main
 
-import com.lconsulting.sudoku.data.Sudoku
+import com.lconsulting.sudoku.data.SudokuData
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.spekframework.spek2.Spek
@@ -9,7 +9,7 @@ import org.spekframework.spek2.style.specification.describe
 object SudokuViewModelTest : Spek({
 
     val viewModel by memoized { SudokuViewModel() }
-    val sudoku by memoized { Sudoku() }
+    val sudoku by memoized { SudokuData() }
 
     describe("getIndexSquareInGrid") {
 
