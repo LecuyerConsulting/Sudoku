@@ -1,5 +1,6 @@
 package com.lconsulting.sudoku.ui.main
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.lconsulting.sudoku.R
@@ -934,7 +935,8 @@ class SudokuViewModel : ViewModel() {
      * @param setPossibility
      * @param setPossibilityPair
      */
-    private fun containsOnlyPair(setPossibility: Set<Int>, setPossibilityPair: Set<Int>) =
+    @VisibleForTesting
+    fun containsOnlyPair(setPossibility: Set<Int>, setPossibilityPair: Set<Int>) =
         setPossibility.size == 2 && setPossibility.containsAll(setPossibilityPair)
 
     /**
@@ -945,7 +947,8 @@ class SudokuViewModel : ViewModel() {
      * @param indexPair
      * @return true if there are some values to remove
      */
-    private fun removeValuePair(index: Int, indexPair: Int): Boolean {
+    @VisibleForTesting
+    fun removeValuePair(index: Int, indexPair: Int): Boolean {
         return sudokuData[index].possibility.removeAll(sudokuData[indexPair].possibility)
     }
 
@@ -955,7 +958,8 @@ class SudokuViewModel : ViewModel() {
      * @param position in [0,8]
      * @return value in [0,8]
      */
-    private fun getStartIndexColumnByPosition(position: Int): Int = position
+    @VisibleForTesting
+    fun getStartIndexColumnByPosition(position: Int): Int = position
 
     /**
      * compute the first index of grid with position
@@ -963,7 +967,8 @@ class SudokuViewModel : ViewModel() {
      * @param position in [0,8]
      * @return one value in this set {0, 3, 6, 27, 30, 33, 54, 57, 60}
      */
-    private fun getStartIndexGridByPosition(position: Int): Int =
+    @VisibleForTesting
+    fun getStartIndexGridByPosition(position: Int): Int =
         (3 * position) + (9 * 2 * (position / 3))
 
     /**
@@ -972,7 +977,8 @@ class SudokuViewModel : ViewModel() {
      * @param position in [0,8]
      * @return one value in this set {0, 9, 18, 27, 36, 45, 54, 63, 72}
      */
-    private fun getStartIndexRowByPosition(position: Int): Int = position * 9
+    @VisibleForTesting
+    fun getStartIndexRowByPosition(position: Int): Int = position * 9
 
     /**
      * compute the square index of row with startIndex & position
@@ -980,7 +986,8 @@ class SudokuViewModel : ViewModel() {
      * @param startIndex in {0, 9, 18, 36, 45, 54, 63, 72}
      * @param position in [0,8]
      */
-    private fun getIndexInRow(startIndex: Int, position: Int): Int = startIndex + position
+    @VisibleForTesting
+    fun getIndexInRow(startIndex: Int, position: Int): Int = startIndex + position
 
     /**
      * compute index of column with startIndex & position
@@ -988,7 +995,8 @@ class SudokuViewModel : ViewModel() {
      * @param startIndex in [0,8]
      * @param position in [0,8]
      */
-    private fun getIndexInColumn(startIndex: Int, position: Int): Int = startIndex + position * 9
+    @VisibleForTesting
+    fun getIndexInColumn(startIndex: Int, position: Int): Int = startIndex + position * 9
 
     /**
      * compute index in grid with startIndex & position
@@ -996,7 +1004,8 @@ class SudokuViewModel : ViewModel() {
      * @param startIndex in {0, 3, 6, 27, 30, 33, 54, 57, 60}
      * @param position in [0,8]
      */
-    private fun getIndexInGrid(startIndex: Int, position: Int): Int =
+    @VisibleForTesting
+    fun getIndexInGrid(startIndex: Int, position: Int): Int =
         startIndex + (position % 3) + ((position / 3) * 9)
 
     /**
@@ -1004,21 +1013,24 @@ class SudokuViewModel : ViewModel() {
      * * if index is 70, return 63
      * @param index in  sudoku
      */
-    private fun getStartIndexRow(index: Int) = (index / 9) * 9
+    @VisibleForTesting
+    fun getStartIndexRow(index: Int) = (index / 9) * 9
 
     /**
      * compute first square index in column who contains index
      * * if index is 70, return 7
      * @param index in  sudoku
      */
-    private fun getStartIndexColumn(index: Int) = index % 9
+    @VisibleForTesting
+    fun getStartIndexColumn(index: Int) = index % 9
 
     /**
      * compute first square index in grid who contains index
      * * if index is 70, return 60
      * @param index in  sudoku
      */
-    private fun getStartIndexGrid(index: Int): Int {
+    @VisibleForTesting
+    fun getStartIndexGrid(index: Int): Int {
         val column = index % 9
         val row = index / 9
         return (column / 3) * 3 + ((row / 3) * 3) * 9
@@ -1029,7 +1041,8 @@ class SudokuViewModel : ViewModel() {
      * @param idGrid id of selected grid
      * @param idSquare id of selected square in the grid
      */
-    private fun getIndex(idGrid: Int, idSquare: Int) =
+    @VisibleForTesting
+    fun getIndex(idGrid: Int, idSquare: Int) =
         (3 * (idGrid % 3) + (idSquare % 3)) + (((idSquare / 3) + (idGrid / 3) * 3) * 9)
 
     /**
@@ -1037,7 +1050,8 @@ class SudokuViewModel : ViewModel() {
      * * if index is 70, return 8
      * @param index in  sudoku
      */
-    private fun getIndexGrid(index: Int): Int {
+    @VisibleForTesting
+    fun getIndexGrid(index: Int): Int {
         val indexGrid = getStartIndexGrid(index)
 
         return ((indexGrid % 9) / 3) + (indexGrid / 9)
@@ -1048,7 +1062,8 @@ class SudokuViewModel : ViewModel() {
      * if index is 70, return 4
      * @param index in  sudoku
      */
-    private fun getIndexSquareInGrid(index: Int): Int {
+    @VisibleForTesting
+    fun getIndexSquareInGrid(index: Int): Int {
         val indexRow = getStartIndexRow(index)
         val indexColumn = getStartIndexColumn(index)
 

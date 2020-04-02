@@ -222,7 +222,6 @@ class MainFragment : Fragment() {
         viewModel.insertValueByUser("9", 8, 6)
         viewModel.insertValueByUser("0", 8, 7)
         viewModel.insertValueByUser("0", 8, 8)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
