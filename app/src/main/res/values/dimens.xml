@@ -5,4 +5,7 @@
     <dimen name="police">9sp</dimen>
     <dimen name="numberBigSize">26sp</dimen>
     <dimen name="numberSmallSize">8sp</dimen>
+
+    <dimen name="touchpad_square_size">50sp</dimen>
+    <dimen name="touchpad_size">150sp</dimen>
 </resources>

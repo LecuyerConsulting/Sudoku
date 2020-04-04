@@ -13,6 +13,13 @@ import com.lconsulting.sudoku.data.SquareData
 
 class SquareView : View, ISquareView{
 
+    //0 vide
+    //1 valeur
+    //2 listes
+    var state : Int = 0
+
+    var text : String = "0"
+
     private var squareSize: Float = 0.0f
     private var squareSmallSize: Float = 0.0f
 
@@ -66,7 +73,10 @@ class SquareView : View, ISquareView{
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawRect(square, borderSquarePaint)
-        displayValues(canvas)
+        when(state){
+            1->displayBigValue(canvas, text)
+            2->displayValues(canvas)
+        }
     }
 
     private fun displayValues(canvas: Canvas) {
@@ -97,6 +107,22 @@ class SquareView : View, ISquareView{
             val y = (squareSmallSize * positionY) + textSize
             drawText(value, x, y, numberSmallPaint)
         }
+    }
+
+    fun displaySquareEmpty() {
+        state = 0
+        invalidate()
+    }
+
+    fun displaySquareWithValues(){
+        state = 2
+        invalidate()
+    }
+
+    fun displayValue(txt: String) {
+        state = 1
+        text = txt
+        invalidate()
     }
 
     override fun updateSquare(square: SquareData) {

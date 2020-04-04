@@ -11,8 +11,8 @@ import com.lconsulting.sudoku.data.SquareData
 class SudokuView : GridLayout {
 
     private var onSudokuListener: OnSudokuListener? = null
-    private val listGridViewSelected = mutableListOf<GridView>()
-    private val listGridView: MutableList<GridView> = mutableListOf()
+    private val listGridViewSelected = mutableListOf<GridViewBis>()
+    private val listGridView: MutableList<GridViewBis> = mutableListOf()
 
     constructor(context: Context) : this(context, null)
 
@@ -27,9 +27,9 @@ class SudokuView : GridLayout {
         columnCount = 3
 
         forEach {
-            val grid = it as GridView
+            val grid = it as GridViewBis
             listGridView.add(grid)
-            grid.setOnGridListener(object : GridView.OnGridListener {
+            grid.setOnGridListener(object : GridViewBis.OnGridListener {
                 override fun onClickSquare(position: Int) {
                     if (!listGridViewSelected.contains(grid)) {
                         listGridViewSelected.forEach { gridViewSelected ->

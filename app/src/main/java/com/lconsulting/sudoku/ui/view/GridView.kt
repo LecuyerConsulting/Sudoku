@@ -3,26 +3,23 @@ package com.lconsulting.sudoku.ui.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View.OnClickListener
-import android.widget.GridLayout
-import androidx.core.view.forEach
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.lconsulting.sudoku.R
-import com.lconsulting.sudoku.data.SquareData
+import kotlinx.android.synthetic.main.view_grid.view.*
 
-class GridView : GridLayout {
+class GridView : ConstraintLayout{
 
-    private var onGridListener: OnGridListener? = null
-    private val listSquareView: MutableList<ISquareView> = mutableListOf()
-    private val listSquareViewSelected: MutableList<ISquareView> = mutableListOf()
+    private val listSquareView: MutableList<SquareView> = mutableListOf()
 
-    private val onClickListener = OnClickListener { v ->
-        when (v) {
-            is ISquareView -> {
-                unSelectedSquare()
-                listSquareViewSelected.add(v)
-                v.selectSquare()
-                onGridListener?.onClickSquare((v.tag as String).toInt())
-            }
+    fun clear() {
+        for (squareView in listSquareView) {
+            squareView.displaySquareEmpty()
+        }
+    }
+
+    fun displayValues() {
+        listSquareView.forEachIndexed { index, squareView ->
+            squareView.displayValue(index.toString())
         }
     }
 
@@ -34,53 +31,17 @@ class GridView : GridLayout {
         context,
         attrs,
         defStyleAttr
-    ) {
+    ){
         LayoutInflater.from(context).inflate(R.layout.view_grid, this, true)
-        columnCount = 3
-
-        forEach {
-            listSquareView.add(it as ISquareView)
-            it.setOnClickListener(onClickListener)
-        }
-    }
-
-    fun setOnGridListener(listener: OnGridListener) {
-        onGridListener = listener
-    }
-
-    fun updateGrid(square: Int, solution: SquareData) {
-        listSquareView[square].updateSquare(solution)
-        unSelectedSquare()
-    }
-
-    fun unSelectedSquare() {
-        listSquareViewSelected.forEach {
-            it.unSelectSquare()
-        }
-        listSquareViewSelected.clear()
-    }
-
-    fun selectSquare(idSquare: Int, listValueSelected: List<Int>, idResColor : Int) {
-        val square = listSquareView[idSquare]
-        listSquareViewSelected.add(square)
-        square.selectSquare(listValueSelected, idResColor)
+        listSquareView.add(gsquare1)
+        listSquareView.add(gsquare2)
+        listSquareView.add(gsquare3)
+        listSquareView.add(gsquare4)
+        listSquareView.add(gsquare5)
+        listSquareView.add(gsquare6)
+        listSquareView.add(gsquare7)
+        listSquareView.add(gsquare8)
+        listSquareView.add(gsquare9)
 
     }
-
-    fun enlightenedValue(value: Int) {
-        listSquareView.forEach {
-            it.enlightenedValue(value)
-        }
-    }
-
-    fun unEnlightenedValue() {
-        listSquareView.forEach {
-            it.unEnlightenedValue()
-        }
-    }
-
-    interface OnGridListener {
-        fun onClickSquare(position: Int)
-    }
-
 }
