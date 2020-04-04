@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.*
-import android.widget.Button
-import android.widget.TextView
 import androidx.annotation.IntDef
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
@@ -46,20 +44,21 @@ class MainFragment : Fragment() {
 
     private val onClickListener = View.OnClickListener { v ->
         when (v) {
-            is Button -> {
-                if (idGrid == -1 && idSquare == -1) {
-                    sudoku.unEnlightenedValue()
-                    sudoku.enlightenedValue(v.text.toString().toInt())
-                    tvState.text = resources.getString(R.string.insert_a_value)
-                } else {
-                    viewModel.insertValueByUser(v.text.toString(), idGrid, idSquare)
-                    enableDigitsButton(true)
-                    idGrid = -1
-                    idSquare = -1
-                }
-            }
+//            is Button -> {
+//                if (idGrid == -1 && idSquare == -1) {
+//                    sudoku.unEnlightenedValue()
+//                    sudoku.enlightenedValue(v.text.toString().toInt())
+//                    tvState.text = resources.getString(R.string.insert_a_value)
+//                } else {
+//                    viewModel.insertValueByUser(v.text.toString(), idGrid, idSquare)
+//                    enableDigitsButton(true)
+//                    idGrid = -1
+//                    idSquare = -1
+//                }
+//            }
             else -> when (v.id) {
-                R.id.main -> {
+                R.id.constraintLayout -> {
+                    vTouchPad.closeTouchPad()
                     sudoku.unEnlightenedValue()
                     sudoku.unSelectSquare()
                     enableDigitsButton(true)
@@ -90,6 +89,8 @@ class MainFragment : Fragment() {
         }
     }
 
+
+
     private val onSudokuListener = object : SudokuView.OnSudokuListener {
         override fun onClickSquare(idGrid: Int, idSquare: Int) {
             this@MainFragment.idGrid = idGrid
@@ -117,16 +118,16 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        llButton.forEach {
-            it.setOnClickListener(onClickListener)
-        }
+//        llButton.forEach {
+//            it.setOnClickListener(onClickListener)
+//        }
         llAction.forEach {
             it.setOnClickListener(onClickListener)
         }
 
         sudoku.setOnSudokuListener(onSudokuListener)
 
-        main.setOnClickListener(onClickListener)
+        constraintLayout.setOnClickListener(onClickListener)
 
         enableDigitsButton(true)
         hideActionButton()
@@ -309,10 +310,10 @@ class MainFragment : Fragment() {
     }
 
     private fun enableDigitsButton(isEnabled: Boolean) {
-        llButton.forEach {
-            val tv = it as TextView
-            tv.isEnabled = isEnabled
-        }
+//        llButton.forEach {
+//            val tv = it as TextView
+//            tv.isEnabled = isEnabled
+//        }
     }
 
     private fun hideActionButton() {
@@ -335,10 +336,10 @@ class MainFragment : Fragment() {
     }
 
     private fun updateDigitsButton(possibility: MutableSet<Int>) {
-        llButton.forEach {
-            val tv = it as TextView
-            tv.isEnabled = possibility.contains(tv.text.toString().toInt())
-        }
+//        llButton.forEach {
+//            val tv = it as TextView
+//            tv.isEnabled = possibility.contains(tv.text.toString().toInt())
+//        }
     }
 
 }

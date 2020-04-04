@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.main.MainFragment">
@@ -24,66 +24,34 @@
         android:layout_height="wrap_content"
         android:background="@drawable/background_sudoku"
         android:columnCount="3"
-        app:layout_constraintBottom_toTopOf="@+id/llButton"
+        app:layout_constraintBottom_toTopOf="@+id/vTouchPad"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvState" />
 
-    <GridLayout
-        android:id="@+id/llButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:columnCount="3"
+    <com.lconsulting.sudoku.ui.view.TouchPadView
+        android:id="@+id/vTouchPad"
+        android:layout_width="@dimen/touchpad_size"
+        android:layout_height="@dimen/touchpad_size"
+        app:layoutDescription="@xml/empty_scene"
         app:layout_constraintBottom_toTopOf="@+id/llAction"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sudoku">
 
-        <Button
-            android:layout_width="@dimen/size_button"
-            android:layout_height="@dimen/size_button"
-            android:text="1" />
+        <com.lconsulting.sudoku.ui.view.TouchPadView
+            android:id="@+id/subLevel"
+            android:layout_width="@dimen/touchpad_size"
+            android:layout_height="@dimen/touchpad_size"
+            app:layoutDescription="@xml/empty_scene">
 
-        <Button
-            android:layout_width="@dimen/size_button"
-            android:layout_height="@dimen/size_button"
-            android:text="2" />
+            <com.lconsulting.sudoku.ui.view.GridView
+                android:id="@+id/grid"
+                android:layout_width="@dimen/touchpad_size"
+                android:layout_height="@dimen/touchpad_size" />
+        </com.lconsulting.sudoku.ui.view.TouchPadView>
 
-        <Button
-            android:layout_width="@dimen/size_button"
-            android:layout_height="@dimen/size_button"
-            android:text="3" />
-
-        <Button
-            android:layout_width="@dimen/size_button"
-            android:layout_height="@dimen/size_button"
-            android:text="4" />
-
-        <Button
-            android:layout_width="@dimen/size_button"
-            android:layout_height="@dimen/size_button"
-            android:text="5" />
-
-        <Button
-            android:layout_width="@dimen/size_button"
-            android:layout_height="@dimen/size_button"
-            android:text="6" />
-
-        <Button
-            android:layout_width="@dimen/size_button"
-            android:layout_height="@dimen/size_button"
-            android:text="7" />
-
-        <Button
-            android:layout_width="@dimen/size_button"
-            android:layout_height="@dimen/size_button"
-            android:text="8" />
-
-        <Button
-            android:layout_width="@dimen/size_button"
-            android:layout_height="@dimen/size_button"
-            android:text="9" />
-    </GridLayout>
+    </com.lconsulting.sudoku.ui.view.TouchPadView>
 
     <GridLayout
         android:id="@+id/llAction"
@@ -93,7 +61,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/llButton">
+        app:layout_constraintTop_toBottomOf="@+id/vTouchPad">
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/btnPrevious"
@@ -126,10 +94,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/llButton"
-        app:layout_constraintEnd_toStartOf="@+id/llButton"
+        app:layout_constraintBottom_toBottomOf="@+id/vTouchPad"
+        app:layout_constraintEnd_toStartOf="@+id/vTouchPad"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/llButton">
+        app:layout_constraintTop_toTopOf="@+id/vTouchPad">
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:layout_width="@dimen/size_button"
@@ -151,10 +119,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/llButton"
+        app:layout_constraintBottom_toBottomOf="@+id/vTouchPad"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/llButton"
-        app:layout_constraintTop_toTopOf="@+id/llButton">
+        app:layout_constraintStart_toEndOf="@+id/vTouchPad"
+        app:layout_constraintTop_toTopOf="@+id/vTouchPad">
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:layout_width="@dimen/size_button"

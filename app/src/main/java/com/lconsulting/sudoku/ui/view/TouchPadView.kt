@@ -100,7 +100,7 @@ class TouchPadView : MotionLayout {
         when (it) {
             is SquareView -> {
                 val indice = it.tag.toString().toInt() - 1
-                openGrid(listConstraint[indice])
+                openTouchPad(listConstraint[indice])
             }
         }
     }
@@ -191,7 +191,7 @@ class TouchPadView : MotionLayout {
         rebuildScene()
     }
 
-    private fun openGrid(constraintConnectData: MutableList<ConstraintConnectData>): Boolean {
+    private fun openTouchPad(constraintConnectData: MutableList<ConstraintConnectData>): Boolean {
         if (!isOpen) {
             animateGrid(
                 stateSubLevelClose, stateSubLevelOpen, stateOpenSquare, stateCloseSquare,
@@ -204,10 +204,10 @@ class TouchPadView : MotionLayout {
         return false
     }
 
-    fun closeGrid(): Boolean {
+    fun closeTouchPad(): Boolean {
         var result = false
         if (isLevel) {
-            result = (subLevelView as TouchPadView).closeGrid()
+            result = (subLevelView as TouchPadView).closeTouchPad()
         }
         if (isOpen && !result) {
             animateGrid(
