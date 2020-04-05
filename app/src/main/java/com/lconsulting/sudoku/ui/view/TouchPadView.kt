@@ -2,7 +2,6 @@ package com.lconsulting.sudoku.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -111,7 +110,6 @@ class TouchPadView : MotionLayout {
         when (it) {
             is SquareView -> {
                 idGridSelected = it.tag.toString().toInt() - 1
-                Log.d("tom971", "TouchPadView onClickListener ${idGridSelected+1}")
                 touchPadListener?.onSelectIdGrid(idGridSelected)
             }
         }
@@ -119,14 +117,12 @@ class TouchPadView : MotionLayout {
 
     private val onGridViewListener = object : GridViewListener {
         override fun onClickValue(value: Int) {
-            Log.d("tom971", "TouchPadView onGridViewListener onClickValue $value")
             touchPadListener?.onSelectValue(value)
         }
     }
 
     private val subTouchPadListener = object : TouchPadListener {
         override fun onSelectIdGrid(idGrid: Int) {
-            Log.d("tom971", "TouchPadView subTouchPadListener onSelectIdGrid $idGrid")
             touchPadListener?.onSelectIdSquare(idGrid)
         }
 
@@ -135,12 +131,10 @@ class TouchPadView : MotionLayout {
         }
 
         override fun onSelectValue(value: Int) {
-            Log.d("tom971", "TouchPadView subTouchPadListener onSelectValue $value")
             touchPadListener?.onSelectValue(value)
         }
 
         override fun onUnSelectIdGrid(idGrid: Int) {
-            Log.d("tom971", "TouchPadView subTouchPadListener onUnSelectIdGrid $idGrid")
             touchPadListener?.onUnSelectIdSquare(idGrid)
         }
 
@@ -240,16 +234,24 @@ class TouchPadView : MotionLayout {
         (subLevelView as TouchPadView).refreshSubView(idSquare)
     }
 
-    fun refreshView(listSquareData: MutableList<SquareData>) {
+    private fun refreshView(listSquareData: MutableList<SquareData>) {
         this@TouchPadView.listSquareData = listSquareData
         listSquareView.forEachIndexed { index, squareView ->
             squareView.displayValue(listSquareData[index])
         }
     }
 
-    fun refreshSubView(idSquare: Int) {
+    private fun refreshSubView(idSquare: Int) {
         (subLevelView as GridView).refreshView(listSquareData!![idSquare].possibility)
         openTouchPad(listConstraint[idGridSelected])
+    }
+
+    fun refreshTouchPad(listSquareData: MutableList<SquareData>){
+        (subLevelView as TouchPadView).refreshSubTouchPad(listSquareData)
+    }
+
+    private fun refreshSubTouchPad(listSquareData: MutableList<SquareData>) {
+        refreshView(listSquareData)
     }
 
     private fun openTouchPad(constraintConnectData: MutableList<ConstraintConnectData>): Boolean {

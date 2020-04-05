@@ -3,7 +3,6 @@ package com.lconsulting.sudoku.ui.main
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.*
 import androidx.annotation.IntDef
 import androidx.core.view.forEach
@@ -93,32 +92,27 @@ class MainFragment : Fragment() {
         override fun onSelectIdGrid(idGrid: Int) {
             this@MainFragment.idGrid = idGrid
             sudoku.selectGrid(idGrid)
-            viewModel.getListSquareByIdGrid(idGrid)
-            Log.d("tom971", "MainFragment onSelectIdGrid ${this@MainFragment.idGrid} ${this@MainFragment.idSquare}")
+            viewModel.computeListSquareByIdGrid(idGrid)
         }
 
         override fun onSelectIdSquare(idSquare: Int) {
             this@MainFragment.idSquare = idSquare
             sudoku.selectSquare(idSquare)
             vTouchPad.openSubTouchPad(idSquare)
-            Log.d("tom971", "MainFragment onSelectIdSquare ${this@MainFragment.idGrid} ${this@MainFragment.idSquare}")
         }
 
         override fun onSelectValue(value: Int) {
             viewModel.insertValueByUser(value.toString(), idGrid, idSquare)
-            Log.d("tom971", "MainFragment onSelectValue ${this@MainFragment.idGrid} ${this@MainFragment.idSquare}")
         }
 
         override fun onUnSelectIdGrid(idGrid: Int) {
             this@MainFragment.idGrid = -1
             sudoku.unSelectGrid(idGrid)
-            Log.d("tom971", "MainFragment onUnSelectIdGrid ${this@MainFragment.idGrid} ${this@MainFragment.idSquare}")
         }
 
         override fun onUnSelectIdSquare(idSquare: Int) {
             this@MainFragment.idSquare = -1
             sudoku.unSelectSquare(idSquare)
-            Log.d("tom971", "MainFragment onUnSelectIdSquare ${this@MainFragment.idGrid} ${this@MainFragment.idSquare}")
         }
     }
 
@@ -283,13 +277,13 @@ class MainFragment : Fragment() {
         when (state) {
             is SudokuState.FillSquare -> {
                 sudoku.updateSudoku(state.sudoku)
+                vTouchPad.refreshTouchPad(state.listSquareData)
                 tvState.text = resources.getString(state.idRes, state.value)
                 displayActionButton(state.isFirstItem, state.isLastItem)
             }
             is SudokuState.SuccessAlgo -> {
                 val listValueSelected = state.listValueSelected.toList()
 
-                Log.d("tom971", "${state.listValueSelected.size}")
                 tvState.text = when (state.listValueSelected.size) {
                     2 -> resources.getString(
                         state.idRes,

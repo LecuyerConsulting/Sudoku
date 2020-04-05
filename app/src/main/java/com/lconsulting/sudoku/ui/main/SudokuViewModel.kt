@@ -13,7 +13,8 @@ import com.lconsulting.sudoku.memento.Originator
 sealed class SudokuState {
     class FillSquare(
         val sudoku: Array<SquareData>, val idRes: Int, val value: Int,
-        val isFirstItem: Boolean, val isLastItem: Boolean
+        val isFirstItem: Boolean, val isLastItem: Boolean,
+        val listSquareData: MutableList<SquareData>
     ) : SudokuState()
 
     class SuccessAlgo(
@@ -100,6 +101,7 @@ class SudokuViewModel : ViewModel() {
      */
     fun insertValueByUser(sValue: String, idGrid: Int, idSquare: Int) {
         if (sValue != "0") {
+
             val index = getIndex(idGrid, idSquare)
 
             val newValue = sValue.toInt()
@@ -109,7 +111,9 @@ class SudokuViewModel : ViewModel() {
                 removeValue(oldValue, index)
             }
 
-            addValue(newValue, R.color.colorValue, index)
+            if (newValue != oldValue) {
+                addValue(newValue, R.color.colorValue, index)
+            }
 
             saveState(newValue, idGrid, idSquare, R.color.colorValue)
 
@@ -119,7 +123,8 @@ class SudokuViewModel : ViewModel() {
                     R.string.insert_value,
                     newValue,
                     caretaker.isFirstItem(),
-                    caretaker.isLastItem()
+                    caretaker.isLastItem(),
+                    getListSquareByIdGrid(idGrid)
                 )
             )
         }
@@ -1075,19 +1080,25 @@ class SudokuViewModel : ViewModel() {
     }
 
     /**
-     * return square who compose the grid at position idGrid
+     * return squares who compose the grid at position idGrid
      *
      * @param idGrid in sudoku
      * @return list of square data
      */
-    fun getListSquareByIdGrid(idGrid: Int) {
+    @VisibleForTesting
+    fun getListSquareByIdGrid(idGrid: Int): MutableList<SquareData> {
         val listSquareData = mutableListOf<SquareData>()
         val startIndexGrid = getStartIndexGridByPosition(idGrid)
         for (position in 0 until 9) {
             val idSquare = getIndexInGrid(startIndexGrid, position)
             listSquareData.add(sudokuData[idSquare])
         }
-
-        state.postValue(SudokuState.RefreshTouchPad(listSquareData))
+        return listSquareData
     }
+
+    fun computeListSquareByIdGrid(idGrid: Int) {
+        state.postValue(SudokuState.RefreshTouchPad(getListSquareByIdGrid(idGrid)))
+    }
+
+
 }

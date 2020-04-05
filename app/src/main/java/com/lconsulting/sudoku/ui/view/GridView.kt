@@ -2,7 +2,6 @@ package com.lconsulting.sudoku.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -26,7 +25,6 @@ class GridView : ConstraintLayout {
     private val onClickListener = OnClickListener {
         val valueSelected = it.tag.toString().toInt()
         if (possibility!!.contains(valueSelected)) {
-            Log.d("tom971", "GridView onClickListener ${it.tag}")
             listener?.onClickValue(valueSelected)
         }
 
