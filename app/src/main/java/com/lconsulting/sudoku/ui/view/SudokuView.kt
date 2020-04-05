@@ -2,6 +2,7 @@ package com.lconsulting.sudoku.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.GridLayout
 import androidx.core.view.forEach
@@ -69,13 +70,7 @@ class SudokuView : GridLayout {
         }
     }
 
-    fun unSelectSquare(){
-        listGridViewSelected.forEach {
-            it.unSelectedSquare()
-        }
 
-        listGridViewSelected.clear()
-    }
 
     fun enlightenedValue(value: Int) {
         listGridView.forEach {
@@ -86,6 +81,34 @@ class SudokuView : GridLayout {
     fun unEnlightenedValue() {
         listGridView.forEach {
             it.unEnlightenedValue()
+        }
+    }
+
+    fun selectGrid(idGrid: Int){
+        listGridViewSelected.add(listGridView[idGrid])
+        listGridView[idGrid].selectGrid()
+    }
+
+    fun unSelectGrid(idGrid: Int){
+        listGridView[idGrid].unSelectGrid()
+        listGridViewSelected.clear()
+    }
+
+    fun selectSquare(idSquare : Int){
+        listGridViewSelected.forEach {
+            it.selectSquare(idSquare)
+        }
+    }
+
+    fun unSelectSquare(idSquare : Int){
+        listGridViewSelected.forEach {
+            it.unSelectSquare(idSquare)
+        }
+    }
+
+        fun unSelectSquare(){
+        listGridViewSelected.forEach {
+            it.unSelectedSquare()
         }
     }
 

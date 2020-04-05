@@ -2,6 +2,7 @@ package com.lconsulting.sudoku.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import android.widget.GridLayout
@@ -77,6 +78,32 @@ class GridViewBis : GridLayout {
         listSquareView.forEach {
             it.unEnlightenedValue()
         }
+    }
+
+    /** NEW FUNCTION **/
+
+    fun selectGrid() {
+        background = resources.getDrawable(R.drawable.background_grid_selected)
+    }
+
+    fun unSelectGrid() {
+        background = resources.getDrawable(R.drawable.background_square)
+    }
+
+    fun selectSquare(idSquare: Int){
+        Log.d("tom971", "GridViewBis 1 selectSquare ${listSquareViewSelected.size} $idSquare")
+        listSquareViewSelected.add(listSquareView[idSquare])
+        listSquareView[idSquare].selectSquare()
+        Log.d("tom971", "GridViewBis 2 selectSquare ${listSquareViewSelected.size} $idSquare")
+    }
+
+    fun unSelectSquare(idSquare: Int){
+        Log.d("tom971", "GridViewBis 1 unSelectSquare ${listSquareViewSelected.size} $idSquare")
+        listSquareViewSelected.forEach {
+            it.unSelectSquare()
+        }
+        listSquareViewSelected.clear()
+        Log.d("tom971", "GridViewBis 2 unSelectSquare ${listSquareViewSelected.size} $idSquare")
     }
 
     interface OnGridListener {

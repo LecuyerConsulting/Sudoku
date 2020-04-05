@@ -15,6 +15,7 @@ import com.lconsulting.sudoku.R
 import com.lconsulting.sudoku.data.SquareData
 import com.lconsulting.sudoku.data.SudokuData
 import com.lconsulting.sudoku.ui.view.SudokuView
+import com.lconsulting.sudoku.ui.view.TouchPadListener
 import kotlinx.android.synthetic.main.main_fragment.*
 import javax.inject.Inject
 
@@ -89,7 +90,27 @@ class MainFragment : Fragment() {
         }
     }
 
+    private val touchPadListener = object : TouchPadListener {
+        override fun onSelectIdGrid(idGrid: Int) {
+            sudoku.selectGrid(idGrid)
+        }
 
+        override fun onSelectIdSquare(idSquare: Int) {
+            sudoku.selectSquare(idSquare)
+        }
+
+        override fun onSelectValue(value: Int) {
+
+        }
+
+        override fun onUnSelectIdGrid(idGrid: Int) {
+            sudoku.unSelectGrid(idGrid)
+        }
+
+        override fun onUnSelectIdSquare(idSquare: Int) {
+            sudoku.unSelectSquare(idSquare)
+        }
+    }
 
     private val onSudokuListener = object : SudokuView.OnSudokuListener {
         override fun onClickSquare(idGrid: Int, idSquare: Int) {
@@ -118,6 +139,9 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        vTouchPad.touchPadListener = touchPadListener
+
 //        llButton.forEach {
 //            it.setOnClickListener(onClickListener)
 //        }
