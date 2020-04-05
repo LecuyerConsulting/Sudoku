@@ -2,7 +2,6 @@ package com.lconsulting.sudoku.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import android.widget.GridLayout
@@ -51,7 +50,6 @@ class GridViewBis : GridLayout {
 
     fun updateGrid(square: Int, solution: SquareData) {
         listSquareView[square].updateSquare(solution)
-        unSelectedSquare()
     }
 
     fun unSelectedSquare() {
@@ -61,7 +59,7 @@ class GridViewBis : GridLayout {
         listSquareViewSelected.clear()
     }
 
-    fun selectSquare(idSquare: Int, listValueSelected: List<Int>, idResColor : Int) {
+    fun selectSquare(idSquare: Int, listValueSelected: List<Int>, idResColor: Int) {
         val square = listSquareView[idSquare]
         listSquareViewSelected.add(square)
         square.selectSquare(listValueSelected, idResColor)
@@ -90,20 +88,16 @@ class GridViewBis : GridLayout {
         background = resources.getDrawable(R.drawable.background_square)
     }
 
-    fun selectSquare(idSquare: Int){
-        Log.d("tom971", "GridViewBis 1 selectSquare ${listSquareViewSelected.size} $idSquare")
+    fun selectSquare(idSquare: Int) {
         listSquareViewSelected.add(listSquareView[idSquare])
         listSquareView[idSquare].selectSquare()
-        Log.d("tom971", "GridViewBis 2 selectSquare ${listSquareViewSelected.size} $idSquare")
     }
 
-    fun unSelectSquare(idSquare: Int){
-        Log.d("tom971", "GridViewBis 1 unSelectSquare ${listSquareViewSelected.size} $idSquare")
+    fun unSelectSquare(idSquare: Int) {
         listSquareViewSelected.forEach {
             it.unSelectSquare()
         }
         listSquareViewSelected.clear()
-        Log.d("tom971", "GridViewBis 2 unSelectSquare ${listSquareViewSelected.size} $idSquare")
     }
 
     interface OnGridListener {

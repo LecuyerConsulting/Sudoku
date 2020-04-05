@@ -34,7 +34,8 @@ class MainFragment : Fragment() {
     }
 
     private lateinit var viewModel: SudokuViewModel
-    @Inject lateinit var sudokuData: SudokuData
+    @Inject
+    lateinit var sudokuData: SudokuData
 
     @StateResolver
     private var statePlayer = PLAY
@@ -63,8 +64,6 @@ class MainFragment : Fragment() {
                     sudoku.unEnlightenedValue()
                     sudoku.unSelectSquare()
                     enableDigitsButton(true)
-                    idGrid = -1
-                    idSquare = -1
                     tvState.text = resources.getString(R.string.insert_a_value)
                 }
                 R.id.btnPlay -> {
@@ -92,22 +91,26 @@ class MainFragment : Fragment() {
 
     private val touchPadListener = object : TouchPadListener {
         override fun onSelectIdGrid(idGrid: Int) {
+            this@MainFragment.idGrid = idGrid
             sudoku.selectGrid(idGrid)
         }
 
         override fun onSelectIdSquare(idSquare: Int) {
+            this@MainFragment.idSquare = idSquare
             sudoku.selectSquare(idSquare)
         }
 
         override fun onSelectValue(value: Int) {
-
+            viewModel.insertValueByUser(value.toString(), idGrid, idSquare)
         }
 
         override fun onUnSelectIdGrid(idGrid: Int) {
+            this@MainFragment.idGrid = -1
             sudoku.unSelectGrid(idGrid)
         }
 
         override fun onUnSelectIdSquare(idSquare: Int) {
+            this@MainFragment.idSquare = -1
             sudoku.unSelectSquare(idSquare)
         }
     }

@@ -10,7 +10,7 @@ import androidx.constraintlayout.motion.widget.MotionScene
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.forEach
 import com.lconsulting.sudoku.R
-import com.lconsulting.sudoku.ui.view.GridView.*
+import com.lconsulting.sudoku.ui.view.GridView.GridViewListener
 
 class TouchPadView : MotionLayout {
 
@@ -98,26 +98,26 @@ class TouchPadView : MotionLayout {
 
     private var isLevel: Boolean = false
 
-    var touchPadListener : TouchPadListener? = null
+    var touchPadListener: TouchPadListener? = null
 
     private var idGridSelected = 0
 
     private val onClickListener = OnClickListener {
         when (it) {
             is SquareView -> {
-                idGridSelected =  it.tag.toString().toInt() - 1
+                idGridSelected = it.tag.toString().toInt() - 1
                 openTouchPad(listConstraint[idGridSelected])
             }
         }
     }
 
-    private val onGridViewListener = object : GridViewListener{
+    private val onGridViewListener = object : GridViewListener {
         override fun onClickValue(value: Int) {
             touchPadListener?.onSelectValue(value)
         }
     }
 
-    private val subTouchPadListener = object : TouchPadListener{
+    private val subTouchPadListener = object : TouchPadListener {
         override fun onSelectIdGrid(idGrid: Int) {
             touchPadListener?.onSelectIdSquare(idGrid)
         }
@@ -317,12 +317,12 @@ class TouchPadView : MotionLayout {
 }
 
 interface TouchPadListener {
-    fun onSelectIdGrid(idGrid : Int)
-    fun onSelectIdSquare(idSquare : Int)
-    fun onSelectValue(value : Int)
+    fun onSelectIdGrid(idGrid: Int)
+    fun onSelectIdSquare(idSquare: Int)
+    fun onSelectValue(value: Int)
 
-    fun onUnSelectIdGrid(idGrid : Int)
-    fun onUnSelectIdSquare(idSquare : Int)
+    fun onUnSelectIdGrid(idGrid: Int)
+    fun onUnSelectIdSquare(idSquare: Int)
 }
 
 data class StateViewData(val alpha: Float, val scale: Float)

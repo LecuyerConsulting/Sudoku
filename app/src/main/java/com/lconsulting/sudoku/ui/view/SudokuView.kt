@@ -2,7 +2,6 @@ package com.lconsulting.sudoku.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.GridLayout
 import androidx.core.view.forEach
@@ -58,18 +57,19 @@ class SudokuView : GridLayout {
 
             listGridView[grid].updateGrid(square, solution[i])
         }
-
-        unSelectSquare()
     }
 
-    fun selectSquare(listSquareSelected: List<Pair<Int, Int>>, listValueSelected: List<Int>, idResColor : Int) {
+    fun selectSquare(
+        listSquareSelected: List<Pair<Int, Int>>,
+        listValueSelected: List<Int>,
+        idResColor: Int
+    ) {
         listSquareSelected.forEach {
             val grid = listGridView[it.first]
             listGridViewSelected.add(grid)
             grid.selectSquare(it.second, listValueSelected, idResColor)
         }
     }
-
 
 
     fun enlightenedValue(value: Int) {
@@ -84,29 +84,29 @@ class SudokuView : GridLayout {
         }
     }
 
-    fun selectGrid(idGrid: Int){
+    fun selectGrid(idGrid: Int) {
         listGridViewSelected.add(listGridView[idGrid])
         listGridView[idGrid].selectGrid()
     }
 
-    fun unSelectGrid(idGrid: Int){
+    fun unSelectGrid(idGrid: Int) {
         listGridView[idGrid].unSelectGrid()
         listGridViewSelected.clear()
     }
 
-    fun selectSquare(idSquare : Int){
+    fun selectSquare(idSquare: Int) {
         listGridViewSelected.forEach {
             it.selectSquare(idSquare)
         }
     }
 
-    fun unSelectSquare(idSquare : Int){
+    fun unSelectSquare(idSquare: Int) {
         listGridViewSelected.forEach {
             it.unSelectSquare(idSquare)
         }
     }
 
-        fun unSelectSquare(){
+    fun unSelectSquare() {
         listGridViewSelected.forEach {
             it.unSelectedSquare()
         }
