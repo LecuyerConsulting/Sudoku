@@ -10,13 +10,11 @@ class TouchPadSubLevelView : TouchPadView {
 
     private val onGridViewListener = object : GridView.GridViewListener {
         override fun onClickValue(value: Int) {
-
+            mTouchPadViewListener?.onSelectValue(value)
         }
     }
 
     private var mListSquareData: MutableList<SquareData>? = null
-
-    private var mTouchPadViewListener: TouchPadViewListener? = null
 
     private var mIdSquare: Int = -1
 
@@ -49,20 +47,18 @@ class TouchPadSubLevelView : TouchPadView {
         }
     }
 
-    fun setTouchPadViewListener(listener: TouchPadViewListener) {
-        mTouchPadViewListener = listener
+    override fun close() {
+        mTouchPadViewListener?.onUnSelectIdSquare(mIdSquare)
+        mIdSquare = -1
+        closeTouchPad()
     }
 
-    fun refreshValues(listSquareData: MutableList<SquareData>) {
+    override fun refreshValues(listSquareData: MutableList<SquareData>) {
         mListSquareData = listSquareData
         listSquareView.forEachIndexed { index, squareView ->
             squareView.displayValue(listSquareData[index])
         }
     }
 
-    fun close() {
-        mTouchPadViewListener?.onUnSelectIdSquare(mIdSquare)
-        mIdSquare = -1
-        cloTouchPad()
-    }
+
 }

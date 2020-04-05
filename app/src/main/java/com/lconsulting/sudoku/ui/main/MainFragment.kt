@@ -33,6 +33,7 @@ class MainFragment : Fragment() {
     }
 
     private lateinit var viewModel: SudokuViewModel
+
     @Inject
     lateinit var sudokuData: SudokuData
 
@@ -100,7 +101,7 @@ class MainFragment : Fragment() {
         }
 
         override fun onSelectValue(value: Int) {
-//            viewModel.insertValueByUser(value.toString(), idGrid, idSquare)
+            viewModel.insertValueByUser(value.toString(), mIdGrid, mIdSquare)
         }
 
         override fun onUnSelectIdGrid(idGrid: Int) {
@@ -294,7 +295,7 @@ class MainFragment : Fragment() {
         when (state) {
             is SudokuState.FillSquare -> {
                 sudoku.updateSudoku(state.sudoku)
-//                vTouchPad.refreshTouchPad(state.listSquareData)
+                vTouchPad.refreshValues(state.listSquareData)
                 tvState.text = resources.getString(state.idRes, state.value)
                 displayActionButton(state.isFirstItem, state.isLastItem)
             }

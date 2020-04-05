@@ -8,6 +8,7 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.constraintlayout.motion.widget.MotionScene
 import androidx.constraintlayout.widget.ConstraintSet
 import com.lconsulting.sudoku.R
+import com.lconsulting.sudoku.data.SquareData
 
 abstract class TouchPadView : MotionLayout {
 
@@ -81,6 +82,8 @@ abstract class TouchPadView : MotionLayout {
         constraintConnectData9
     )
 
+    protected var mTouchPadViewListener: TouchPadViewListener? = null
+
     private var isOpen = false
 
     private var lastConstraintConnectDataUsed = listConstraint[4]
@@ -117,6 +120,10 @@ abstract class TouchPadView : MotionLayout {
     abstract fun initValues()
 
     abstract fun createOnClickListener()
+
+    abstract fun close()
+
+    abstract fun refreshValues(listSquareData: MutableList<SquareData>)
 
     protected fun initValue(view: View) {
         when (view) {
@@ -232,7 +239,7 @@ abstract class TouchPadView : MotionLayout {
         isOpen = true
     }
 
-    protected fun cloTouchPad() {
+    protected fun closeTouchPad() {
         animateGrid(
             stateSubLevelOpen, stateSubLevelClose, stateCloseSquare, stateOpenSquare,
             constraintCenter, lastConstraintConnectDataUsed!!, true
@@ -241,6 +248,10 @@ abstract class TouchPadView : MotionLayout {
     }
 
     fun isOpen() = isOpen
+
+    fun setTouchPadViewListener(listener: TouchPadViewListener) {
+        mTouchPadViewListener = listener
+    }
 
 }
 

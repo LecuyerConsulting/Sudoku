@@ -8,8 +8,6 @@ import com.lconsulting.sudoku.data.SquareData
 
 class TouchPadMasterLevelView : TouchPadView {
 
-    private var mTouchPadViewListener: TouchPadViewListener? = null
-
     private var idGridSelected = 0
 
 
@@ -27,7 +25,7 @@ class TouchPadMasterLevelView : TouchPadView {
         }
 
         override fun onSelectValue(value: Int) {
-
+            mTouchPadViewListener?.onSelectValue(value)
         }
 
         override fun onUnSelectIdGrid(idGrid: Int) {
@@ -97,25 +95,26 @@ class TouchPadMasterLevelView : TouchPadView {
         }
     }
 
-    fun setTouchPadViewListener(listener: TouchPadViewListener) {
-        mTouchPadViewListener = listener
-    }
-
-    fun open(listSquareData: MutableList<SquareData>) {
-        (subLevelView as TouchPadSubLevelView).refreshValues(listSquareData)
-        openTouchPad(listConstraint[idGridSelected])
-    }
-
-    fun close() {
+    override fun close() {
         if (isOpen()) {
             if ((subLevelView as TouchPadSubLevelView).isOpen()) {
                 (subLevelView as TouchPadSubLevelView).close()
             } else {
                 mTouchPadViewListener?.onUnSelectIdGrid(idGridSelected)
-                cloTouchPad()
+                closeTouchPad()
             }
         }
     }
+
+    override fun refreshValues(listSquareData: MutableList<SquareData>) {
+        (subLevelView as TouchPadSubLevelView).refreshValues(listSquareData)
+    }
+
+    fun open(listSquareData: MutableList<SquareData>) {
+        refreshValues(listSquareData)
+        openTouchPad(listConstraint[idGridSelected])
+    }
+
 
 //    fun setPrepareOpening(idGrid: Int, idSquareForTransition: Int) {
 //        idGridSelected = idGrid
@@ -141,9 +140,7 @@ class TouchPadMasterLevelView : TouchPadView {
 //        openTouchPad(listConstraint[idGridSelected])
 //    }
 //
-//    fun refreshTouchPad(listSquareData: MutableList<SquareData>) {
-//        (subLevelView as TouchPadMasterLevelView).refreshSubTouchPad(listSquareData)
-//    }
+
 //
 //    private fun refreshSubTouchPad(listSquareData: MutableList<SquareData>) {
 //        refreshView(listSquareData)
