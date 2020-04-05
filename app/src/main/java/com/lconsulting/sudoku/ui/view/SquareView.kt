@@ -11,14 +11,16 @@ import android.view.View
 import com.lconsulting.sudoku.R
 import com.lconsulting.sudoku.data.SquareData
 
-class SquareView : View, ISquareView{
+class SquareView : View, ISquareView {
 
     //0 vide
     //1 valeur
     //2 listes
-    var state : Int = 0
+    var state: Int = 0
 
-    var text : String = "0"
+    var isClickeable = true
+
+    var text: String = "0"
 
     private var squareSize: Float = 0.0f
     private var squareSmallSize: Float = 0.0f
@@ -45,6 +47,8 @@ class SquareView : View, ISquareView{
         strokeWidth = 1.0f
         textSize = resources.getDimension(R.dimen.numberSmallSize)
     }
+
+    private var setPossibitity: MutableSet<Int>? = null
 
     constructor(context: Context) : this(context, null)
 
@@ -73,21 +77,28 @@ class SquareView : View, ISquareView{
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawRect(square, borderSquarePaint)
-        when(state){
-            1->displayBigValue(canvas, text)
-            2->displayValues(canvas)
+        when (state) {
+            1 -> displayBigValue(canvas, text)
+            2 -> displayValues(canvas)
         }
     }
 
     private fun displayValues(canvas: Canvas) {
-        val possibility: MutableList<Int> = mutableListOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
-
-        for (i in possibility.indices) {
-            displaySmallValue(canvas, possibility[i].toString(), i % 3, i / 3)
+        for (i in 1..9) {
+            if (setPossibitity!!.contains(i)) {
+                displaySmallValue(canvas, i.toString(), (i - 1) % 3, (i - 1) / 3)
+            }
         }
     }
 
     private fun displayBigValue(canvas: Canvas, value: String) {
+        numberBigPaint.apply {
+            color = if (isClickeable) {
+                Color.BLACK
+            } else {
+                Color.GRAY
+            }
+        }
         canvas.apply {
             val x = (squareSize - numberBigPaint.measureText(value)) / 2
             val textSize = resources.getDimensionPixelSize(R.dimen.numberBigSize).toFloat()
@@ -114,7 +125,7 @@ class SquareView : View, ISquareView{
         invalidate()
     }
 
-    fun displaySquareWithValues(){
+    fun displaySquareWithValues() {
         state = 2
         invalidate()
     }
@@ -122,6 +133,24 @@ class SquareView : View, ISquareView{
     fun displayValue(txt: String) {
         state = 1
         text = txt
+        invalidate()
+    }
+
+    fun displayValue(txt: String, isGrey: Boolean) {
+        state = 1
+        text = txt
+        isClickeable = isGrey
+        invalidate()
+    }
+
+    fun displayValue(data: SquareData) {
+        if (data.value != 0) {
+            state = 1
+            text = data.value.toString()
+        } else {
+            state = 2
+            setPossibitity = data.possibility
+        }
         invalidate()
     }
 

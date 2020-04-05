@@ -2,6 +2,7 @@ package com.lconsulting.sudoku.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -12,7 +13,9 @@ class GridView : ConstraintLayout {
 
     private val listSquareView: MutableList<SquareView> = mutableListOf()
 
-    var listener : GridViewListener? = null
+    var listener: GridViewListener? = null
+
+    var possibility: MutableSet<Int>? = null
 
     fun clear() {
         for (squareView in listSquareView) {
@@ -20,14 +23,13 @@ class GridView : ConstraintLayout {
         }
     }
 
-    fun displayValues() {
-        listSquareView.forEach { squareView ->
-            squareView.displayValue(squareView.tag.toString())
-        }
-    }
-
     private val onClickListener = OnClickListener {
-        listener?.onClickValue(it.tag.toString().toInt())
+        val valueSelected = it.tag.toString().toInt()
+        if (possibility!!.contains(valueSelected)) {
+            Log.d("tom971", "GridView onClickListener ${it.tag}")
+            listener?.onClickValue(valueSelected)
+        }
+
     }
 
     constructor(context: Context) : this(context, null)
@@ -50,7 +52,19 @@ class GridView : ConstraintLayout {
         }
     }
 
-    interface GridViewListener{
-        fun onClickValue(value : Int)
+    fun refreshView(possibility: MutableSet<Int>) {
+        this@GridView.possibility = possibility
+        listSquareView.forEach { squareView ->
+            val valueString = squareView.tag.toString()
+            val valueInt = valueString.toInt()
+            squareView.displayValue(
+                valueString,
+                possibility.contains(valueInt)
+            )
+        }
+    }
+
+    interface GridViewListener {
+        fun onClickValue(value: Int)
     }
 }

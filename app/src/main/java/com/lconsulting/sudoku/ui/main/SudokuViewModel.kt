@@ -29,6 +29,10 @@ sealed class SudokuState {
         val isFirstItem: Boolean, val isLastItem: Boolean
     ) : SudokuState()
 
+    class RefreshTouchPad(
+        val listSquareData: MutableList<SquareData>
+    ) : SudokuState()
+
     class DisplayButton(val possibility: MutableSet<Int>) : SudokuState()
     class Reset(val solution: Array<SquareData>) : SudokuState()
     class DisplayMessage(val idResString: Int) : SudokuState()
@@ -61,7 +65,7 @@ class SudokuViewModel : ViewModel() {
 
     val state = MutableLiveData<SudokuState>()
 
-    lateinit var sudokuData : SudokuData
+    lateinit var sudokuData: SudokuData
 
     /**
      * reset sudoku to default values
@@ -388,9 +392,9 @@ class SudokuViewModel : ViewModel() {
         updateDigitsAvailable(value, getStartIndexRow(index), ::getIndexInRow, ::add)
         updateDigitsAvailable(value, getStartIndexGrid(index), ::getIndexInGrid, ::add)
 
-        for (i in sudokuData.sudoku.indices){
+        for (i in sudokuData.sudoku.indices) {
             val v = sudokuData[i].value
-            if(v != 0 ){
+            if (v != 0) {
                 updateDigitsAvailable(v, getStartIndexGrid(i), ::getIndexInGrid, ::remove)
                 updateDigitsAvailable(v, getStartIndexRow(i), ::getIndexInRow, ::remove)
                 updateDigitsAvailable(v, getStartIndexColumn(i), ::getIndexInColumn, ::remove)
@@ -718,7 +722,7 @@ class SudokuViewModel : ViewModel() {
         )
 
         if (setIndex.size == 1) {
-            var idResString : Int = R.string.pair_found_grid
+            var idResString: Int = R.string.pair_found_grid
             val indexOtherPair = setIndex.toList()[0]
 
             val setIndexSelected = mutableSetOf<Int>()
@@ -800,7 +804,7 @@ class SudokuViewModel : ViewModel() {
         getIndexFor: (start: Int, position: Int) -> Int,
         isColunm: Boolean,
         isRow: Boolean,
-        idResString : Int
+        idResString: Int
     ): Boolean {
         var setIndex = mutableSetOf<Int>()
 
@@ -1068,5 +1072,22 @@ class SudokuViewModel : ViewModel() {
         val indexColumn = getStartIndexColumn(index)
 
         return (((indexRow / 9) % 3) * 3) + (indexColumn % 3)
+    }
+
+    /**
+     * return square who compose the grid at position idGrid
+     *
+     * @param idGrid in sudoku
+     * @return list of square data
+     */
+    fun getListSquareByIdGrid(idGrid: Int) {
+        val listSquareData = mutableListOf<SquareData>()
+        val startIndexGrid = getStartIndexGridByPosition(idGrid)
+        for (position in 0 until 9) {
+            val idSquare = getIndexInGrid(startIndexGrid, position)
+            listSquareData.add(sudokuData[idSquare])
+        }
+
+        state.postValue(SudokuState.RefreshTouchPad(listSquareData))
     }
 }
