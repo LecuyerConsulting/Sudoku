@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvState" />
 
-    <com.lconsulting.sudoku.ui.view.TouchPadView
+    <com.lconsulting.sudoku.ui.view.TouchPadMasterLevelView
         android:id="@+id/vTouchPad"
         android:layout_width="@dimen/touchpad_size"
         android:layout_height="@dimen/touchpad_size"
@@ -39,7 +39,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sudoku">
 
-        <com.lconsulting.sudoku.ui.view.TouchPadView
+        <com.lconsulting.sudoku.ui.view.TouchPadSubLevelView
             android:id="@+id/subLevel"
             android:layout_width="@dimen/touchpad_size"
             android:layout_height="@dimen/touchpad_size"
@@ -49,9 +49,9 @@
                 android:id="@+id/grid"
                 android:layout_width="@dimen/touchpad_size"
                 android:layout_height="@dimen/touchpad_size" />
-        </com.lconsulting.sudoku.ui.view.TouchPadView>
+        </com.lconsulting.sudoku.ui.view.TouchPadSubLevelView>
 
-    </com.lconsulting.sudoku.ui.view.TouchPadView>
+    </com.lconsulting.sudoku.ui.view.TouchPadMasterLevelView>
 
     <GridLayout
         android:id="@+id/llAction"

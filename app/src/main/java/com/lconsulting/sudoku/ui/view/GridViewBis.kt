@@ -18,10 +18,7 @@ class GridViewBis : GridLayout {
     private val onClickListener = OnClickListener { v ->
         when (v) {
             is ISquareView -> {
-                unSelectedSquare()
-                listSquareViewSelected.add(v)
-                v.selectSquare()
-                onGridListener?.onClickSquare((v.tag as String).toInt())
+                onGridListener?.onClickSquare(this@GridViewBis, (v.tag as String).toInt())
             }
         }
     }
@@ -101,7 +98,7 @@ class GridViewBis : GridLayout {
     }
 
     interface OnGridListener {
-        fun onClickSquare(position: Int)
+        fun onClickSquare(view: GridViewBis, position: Int)
     }
 
 }

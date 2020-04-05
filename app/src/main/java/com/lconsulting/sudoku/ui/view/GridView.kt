@@ -10,22 +10,16 @@ import com.lconsulting.sudoku.R
 
 class GridView : ConstraintLayout {
 
-    private val listSquareView: MutableList<SquareView> = mutableListOf()
+    private val mListSquareView: MutableList<SquareView> = mutableListOf()
 
-    var listener: GridViewListener? = null
+    private var mListener: GridViewListener? = null
 
-    var possibility: MutableSet<Int>? = null
-
-    fun clear() {
-        for (squareView in listSquareView) {
-            squareView.displaySquareEmpty()
-        }
-    }
+    private var mPossibility: MutableSet<Int>? = null
 
     private val onClickListener = OnClickListener {
         val valueSelected = it.tag.toString().toInt()
-        if (possibility!!.contains(valueSelected)) {
-            listener?.onClickValue(valueSelected)
+        if (mPossibility!!.contains(valueSelected)) {
+            mListener?.onClickValue(valueSelected)
         }
 
     }
@@ -43,16 +37,16 @@ class GridView : ConstraintLayout {
         forEach {
             when (it) {
                 is SquareView -> {
-                    listSquareView.add(it)
+                    mListSquareView.add(it)
                     it.setOnClickListener(onClickListener)
                 }
             }
         }
     }
 
-    fun refreshView(possibility: MutableSet<Int>) {
-        this@GridView.possibility = possibility
-        listSquareView.forEach { squareView ->
+    fun refreshValues(possibility: MutableSet<Int>) {
+        mPossibility = possibility
+        mListSquareView.forEach { squareView ->
             val valueString = squareView.tag.toString()
             val valueInt = valueString.toInt()
             squareView.displayValue(
@@ -60,6 +54,10 @@ class GridView : ConstraintLayout {
                 possibility.contains(valueInt)
             )
         }
+    }
+
+    fun setGridViewListener(listener : GridViewListener){
+        mListener = listener
     }
 
     interface GridViewListener {

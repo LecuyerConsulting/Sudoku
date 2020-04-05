@@ -14,6 +14,12 @@ class SudokuView : GridLayout {
     private val listGridViewSelected = mutableListOf<GridViewBis>()
     private val listGridView: MutableList<GridViewBis> = mutableListOf()
 
+    private val onGridListener = object : GridViewBis.OnGridListener {
+        override fun onClickSquare(view: GridViewBis, position: Int) {
+            onSudokuListener?.onClickSquare(view.tag.toString().toInt(), position)
+        }
+    }
+
     constructor(context: Context) : this(context, null)
 
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -29,18 +35,7 @@ class SudokuView : GridLayout {
         forEach {
             val grid = it as GridViewBis
             listGridView.add(grid)
-            grid.setOnGridListener(object : GridViewBis.OnGridListener {
-                override fun onClickSquare(position: Int) {
-                    if (!listGridViewSelected.contains(grid)) {
-                        listGridViewSelected.forEach { gridViewSelected ->
-                            gridViewSelected.unSelectedSquare()
-                        }
-                        listGridViewSelected.clear()
-                    }
-                    listGridViewSelected.add(grid)
-                    onSudokuListener?.onClickSquare(grid.tag.toString().toInt(), position)
-                }
-            })
+            grid.setOnGridListener(onGridListener)
         }
     }
 

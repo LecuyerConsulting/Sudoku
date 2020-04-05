@@ -14,7 +14,7 @@ import com.lconsulting.sudoku.R
 import com.lconsulting.sudoku.data.SquareData
 import com.lconsulting.sudoku.data.SudokuData
 import com.lconsulting.sudoku.ui.view.SudokuView
-import com.lconsulting.sudoku.ui.view.TouchPadListener
+import com.lconsulting.sudoku.ui.view.TouchPadViewListener
 import kotlinx.android.synthetic.main.main_fragment.*
 import javax.inject.Inject
 
@@ -39,8 +39,8 @@ class MainFragment : Fragment() {
     @StateResolver
     private var statePlayer = PLAY
 
-    private var idGrid: Int = -1
-    private var idSquare: Int = -1
+    private var mIdGrid: Int = -1
+    private var mIdSquare: Int = -1
     private var isRepeat: Boolean = false
 
     private val onClickListener = View.OnClickListener { v ->
@@ -59,11 +59,11 @@ class MainFragment : Fragment() {
 //            }
             else -> when (v.id) {
                 R.id.constraintLayout -> {
-                    vTouchPad.closeTouchPad()
-                    sudoku.unEnlightenedValue()
-                    sudoku.unSelectSquare()
-                    enableDigitsButton(true)
-                    tvState.text = resources.getString(R.string.insert_a_value)
+                    vTouchPad.close()
+//                    sudoku.unEnlightenedValue()
+//                    sudoku.unSelectSquare()
+//                    enableDigitsButton(true)
+//                    tvState.text = resources.getString(R.string.insert_a_value)
                 }
                 R.id.btnPlay -> {
                     if (statePlayer == STOP) {
@@ -88,39 +88,56 @@ class MainFragment : Fragment() {
         }
     }
 
-    private val touchPadListener = object : TouchPadListener {
+    private val onTouchPadViewListener = object : TouchPadViewListener {
         override fun onSelectIdGrid(idGrid: Int) {
-            this@MainFragment.idGrid = idGrid
-            sudoku.selectGrid(idGrid)
+            mIdGrid = idGrid
             viewModel.computeListSquareByIdGrid(idGrid)
         }
 
         override fun onSelectIdSquare(idSquare: Int) {
-            this@MainFragment.idSquare = idSquare
+            mIdSquare = idSquare
             sudoku.selectSquare(idSquare)
-            vTouchPad.openSubTouchPad(idSquare)
         }
 
         override fun onSelectValue(value: Int) {
-            viewModel.insertValueByUser(value.toString(), idGrid, idSquare)
+//            viewModel.insertValueByUser(value.toString(), idGrid, idSquare)
         }
 
         override fun onUnSelectIdGrid(idGrid: Int) {
-            this@MainFragment.idGrid = -1
             sudoku.unSelectGrid(idGrid)
+            mIdGrid = -1
         }
 
         override fun onUnSelectIdSquare(idSquare: Int) {
-            this@MainFragment.idSquare = -1
             sudoku.unSelectSquare(idSquare)
+            mIdSquare = -1
+        }
+
+        override fun onOpenSubTouchBar() {
+//            sudoku.selectSquare(idSquare)
+//            vTouchPad.openSubTouchPad(idSquare)
+        }
+
+        override fun onCloseSubTouchBar() {
+
         }
     }
 
     private val onSudokuListener = object : SudokuView.OnSudokuListener {
         override fun onClickSquare(idGrid: Int, idSquare: Int) {
-            this@MainFragment.idGrid = idGrid
-            this@MainFragment.idSquare = idSquare
-            viewModel.getDigitAvailable(idGrid, idSquare)
+//            when(this@MainFragment.idGrid){
+//                -1 -> {
+//                    this@MainFragment.idGrid = idGrid
+//                    this@MainFragment.idSquare = idSquare
+//                    vTouchPad.setPrepareOpening(idGrid, idSquare)
+//                    viewModel.computeListSquareByIdGrid(idGrid)
+//                }
+//                else ->{
+//                    vTouchPad.setPrepareClosing()
+//                    vTouchPad.closeTouchPad()
+//                }
+//
+//            }
         }
     }
 
@@ -144,7 +161,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        vTouchPad.touchPadListener = touchPadListener
+        vTouchPad.setTouchPadViewListener(onTouchPadViewListener)
 
 //        llButton.forEach {
 //            it.setOnClickListener(onClickListener)
@@ -277,7 +294,7 @@ class MainFragment : Fragment() {
         when (state) {
             is SudokuState.FillSquare -> {
                 sudoku.updateSudoku(state.sudoku)
-                vTouchPad.refreshTouchPad(state.listSquareData)
+//                vTouchPad.refreshTouchPad(state.listSquareData)
                 tvState.text = resources.getString(state.idRes, state.value)
                 displayActionButton(state.isFirstItem, state.isLastItem)
             }
@@ -320,7 +337,8 @@ class MainFragment : Fragment() {
                 displayActionButton(state.isFirstItem, state.isLastItem)
             }
             is SudokuState.RefreshTouchPad -> {
-                vTouchPad.openTouchPad(state.listSquareData)
+                sudoku.selectGrid(mIdGrid)
+                vTouchPad.open(state.listSquareData)
             }
 
         }
