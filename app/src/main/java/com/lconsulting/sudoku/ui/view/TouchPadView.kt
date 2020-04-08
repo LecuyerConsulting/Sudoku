@@ -171,7 +171,6 @@ abstract class TouchPadView : MotionLayout {
         endSet.clone(this)
 
         setTransition(squareTransition!!)
-//        setTransitionListener(onTransitionListener)
         rebuildScene()
     }
 
@@ -266,7 +265,4 @@ interface TouchPadViewListener {
 
     fun onUnSelectIdGrid(idGrid: Int)
     fun onUnSelectIdSquare(idSquare: Int)
-
-    fun onOpenSubTouchBar()
-    fun onCloseSubTouchBar()
 }

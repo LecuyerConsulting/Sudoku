@@ -45,46 +45,28 @@ class MainFragment : Fragment() {
     private var isRepeat: Boolean = false
 
     private val onClickListener = View.OnClickListener { v ->
-        when (v) {
-//            is Button -> {
-//                if (idGrid == -1 && idSquare == -1) {
-//                    sudoku.unEnlightenedValue()
-//                    sudoku.enlightenedValue(v.text.toString().toInt())
-//                    tvState.text = resources.getString(R.string.insert_a_value)
-//                } else {
-//                    viewModel.insertValueByUser(v.text.toString(), idGrid, idSquare)
-//                    enableDigitsButton(true)
-//                    idGrid = -1
-//                    idSquare = -1
-//                }
-//            }
-            else -> when (v.id) {
-                R.id.constraintLayout -> {
-                    vTouchPad.close()
-//                    sudoku.unEnlightenedValue()
-//                    sudoku.unSelectSquare()
-//                    enableDigitsButton(true)
-//                    tvState.text = resources.getString(R.string.insert_a_value)
-                }
-                R.id.btnPlay -> {
-                    if (statePlayer == STOP) {
-                        setRepeatMode(PLAY, R.drawable.baseline_play_arrow_black_24, false)
-                    } else {
-                        viewModel.startAlgo()
-                    }
-                }
-                R.id.btnRepeat -> {
-                    setRepeatMode(STOP, R.drawable.baseline_stop_black_24, true)
+        when (v.id) {
+            R.id.constraintLayout -> {
+                vTouchPad.close()
+            }
+            R.id.btnPlay -> {
+                if (statePlayer == STOP) {
+                    setRepeatMode(PLAY, R.drawable.baseline_play_arrow_black_24, false)
+                } else {
                     viewModel.startAlgo()
                 }
-                R.id.btnPrevious -> {
-                    tvState.text = resources.getString(R.string.insert_a_value)
-                    viewModel.setPreviousState()
-                }
-                R.id.btnNext -> {
-                    tvState.text = resources.getString(R.string.insert_a_value)
-                    viewModel.setNextState()
-                }
+            }
+            R.id.btnRepeat -> {
+                setRepeatMode(STOP, R.drawable.baseline_stop_black_24, true)
+                viewModel.startAlgo()
+            }
+            R.id.btnPrevious -> {
+                tvState.text = resources.getString(R.string.insert_a_value)
+                viewModel.setPreviousState()
+            }
+            R.id.btnNext -> {
+                tvState.text = resources.getString(R.string.insert_a_value)
+                viewModel.setNextState()
             }
         }
     }
@@ -113,32 +95,11 @@ class MainFragment : Fragment() {
             sudoku.unSelectSquare(idSquare)
             mIdSquare = -1
         }
-
-        override fun onOpenSubTouchBar() {
-//            sudoku.selectSquare(idSquare)
-//            vTouchPad.openSubTouchPad(idSquare)
-        }
-
-        override fun onCloseSubTouchBar() {
-
-        }
     }
 
     private val onSudokuListener = object : SudokuView.OnSudokuListener {
         override fun onClickSquare(idGrid: Int, idSquare: Int) {
-//            when(this@MainFragment.idGrid){
-//                -1 -> {
-//                    this@MainFragment.idGrid = idGrid
-//                    this@MainFragment.idSquare = idSquare
-//                    vTouchPad.setPrepareOpening(idGrid, idSquare)
-//                    viewModel.computeListSquareByIdGrid(idGrid)
-//                }
-//                else ->{
-//                    vTouchPad.setPrepareClosing()
-//                    vTouchPad.closeTouchPad()
-//                }
-//
-//            }
+
         }
     }
 
@@ -164,9 +125,6 @@ class MainFragment : Fragment() {
 
         vTouchPad.setTouchPadViewListener(onTouchPadViewListener)
 
-//        llButton.forEach {
-//            it.setOnClickListener(onClickListener)
-//        }
         llAction.forEach {
             it.setOnClickListener(onClickListener)
         }
@@ -175,7 +133,6 @@ class MainFragment : Fragment() {
 
         constraintLayout.setOnClickListener(onClickListener)
 
-        enableDigitsButton(true)
         hideActionButton()
     }
 
@@ -332,7 +289,6 @@ class MainFragment : Fragment() {
                 setRepeatMode(PLAY, R.drawable.baseline_play_arrow_black_24, false)
                 tvState.text = resources.getString(state.idResString)
             }
-            is SudokuState.DisplayButton -> updateDigitsButton(state.possibility)
             is SudokuState.RestoreState -> {
                 sudoku.updateSudoku(state.sudoku)
                 displayActionButton(state.isFirstItem, state.isLastItem)
@@ -360,13 +316,6 @@ class MainFragment : Fragment() {
         this.isRepeat = isRepeat
     }
 
-    private fun enableDigitsButton(isEnabled: Boolean) {
-//        llButton.forEach {
-//            val tv = it as TextView
-//            tv.isEnabled = isEnabled
-//        }
-    }
-
     private fun hideActionButton() {
         btnPrevious.visibility = View.INVISIBLE
         btnNext.visibility = View.INVISIBLE
@@ -384,13 +333,6 @@ class MainFragment : Fragment() {
         } else {
             View.VISIBLE
         }
-    }
-
-    private fun updateDigitsButton(possibility: MutableSet<Int>) {
-//        llButton.forEach {
-//            val tv = it as TextView
-//            tv.isEnabled = possibility.contains(tv.text.toString().toInt())
-//        }
     }
 
 }
