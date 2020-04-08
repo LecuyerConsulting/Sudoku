@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
+import android.widget.RadioGroup
 import androidx.annotation.IntDef
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
@@ -103,6 +104,18 @@ class MainFragment : Fragment() {
         }
     }
 
+    private val onCheckedChangeListener =
+        RadioGroup.OnCheckedChangeListener { group, checkedId ->
+            viewModel.updateColor(
+                when (checkedId) {
+                    R.id.cb_find -> R.color.colorValueFound
+                    R.id.cb_possibility -> R.color.colorValue
+                    else -> R.color.colorText
+
+                }
+            )
+        }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (activity?.applicationContext as MyApplication).appComponent.inject(this)
@@ -128,10 +141,9 @@ class MainFragment : Fragment() {
         llAction.forEach {
             it.setOnClickListener(onClickListener)
         }
-
         sudoku.setOnSudokuListener(onSudokuListener)
-
         constraintLayout.setOnClickListener(onClickListener)
+        rgColorChoice.setOnCheckedChangeListener(onCheckedChangeListener)
 
         hideActionButton()
     }

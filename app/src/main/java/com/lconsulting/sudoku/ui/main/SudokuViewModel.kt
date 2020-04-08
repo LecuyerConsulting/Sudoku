@@ -68,6 +68,8 @@ class SudokuViewModel : ViewModel() {
 
     lateinit var sudokuData: SudokuData
 
+    private var mIdColorRes = R.color.colorText
+
     /**
      * reset sudoku to default values
      */
@@ -112,10 +114,10 @@ class SudokuViewModel : ViewModel() {
             }
 
             if (newValue != oldValue) {
-                addValue(newValue, R.color.colorValue, index)
+                addValue(newValue, mIdColorRes, index)
             }
 
-            saveState(newValue, idGrid, idSquare, R.color.colorValue)
+            saveState(newValue, idGrid, idSquare, mIdColorRes)
 
             state.postValue(
                 SudokuState.FillSquare(
@@ -1098,6 +1100,10 @@ class SudokuViewModel : ViewModel() {
 
     fun computeListSquareByIdGrid(idGrid: Int) {
         state.postValue(SudokuState.RefreshTouchPad(getListSquareByIdGrid(idGrid)))
+    }
+
+    fun updateColor(idRes: Int){
+        mIdColorRes = idRes
     }
 
 

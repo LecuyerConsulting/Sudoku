@@ -90,7 +90,8 @@
             android:src="@drawable/baseline_repeat_black_24" />
     </GridLayout>
 
-    <LinearLayout
+    <RadioGroup
+        android:id="@+id/rgColorChoice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -99,21 +100,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/vTouchPad">
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <RadioButton
+            android:id="@+id/cb_default"
             android:layout_width="@dimen/size_button"
             android:layout_height="@dimen/size_button"
-            android:src="@drawable/baseline_brush_black_24" />
+            android:button="@drawable/selector_value1" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <RadioButton
+            android:id="@+id/cb_find"
             android:layout_width="@dimen/size_button"
             android:layout_height="@dimen/size_button"
-            android:src="@drawable/baseline_colorize_black_24" />
+            android:button="@drawable/selector_value2" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <RadioButton
+            android:id="@+id/cb_possibility"
             android:layout_width="@dimen/size_button"
             android:layout_height="@dimen/size_button"
-            android:src="@drawable/baseline_edit_black_24" />
-    </LinearLayout>
+            android:button="@drawable/selector_value3" />
+    </RadioGroup>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -133,6 +137,11 @@
             android:layout_width="@dimen/size_button"
             android:layout_height="@dimen/size_button"
             android:src="@drawable/baseline_wb_sunny_black_24" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:layout_width="@dimen/size_button"
+            android:layout_height="@dimen/size_button"
+            android:src="@drawable/baseline_grid_on_black_24" />
     </LinearLayout>
 
 
