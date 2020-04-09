@@ -18,10 +18,7 @@ class GridView : ConstraintLayout {
 
     private val onClickListener = OnClickListener {
         val valueSelected = it.tag.toString().toInt()
-        if (mPossibility!!.contains(valueSelected)) {
-            mListener?.onClickValue(valueSelected)
-        }
-
+        mListener?.onClickValue(valueSelected)
     }
 
     constructor(context: Context) : this(context, null)
@@ -56,7 +53,7 @@ class GridView : ConstraintLayout {
         }
     }
 
-    fun setGridViewListener(listener : GridViewListener){
+    fun setGridViewListener(listener: GridViewListener) {
         mListener = listener
     }
 

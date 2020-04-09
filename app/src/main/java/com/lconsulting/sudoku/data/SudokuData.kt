@@ -1,5 +1,6 @@
 package com.lconsulting.sudoku.data
 
+import android.util.Log
 import javax.inject.Inject
 
 class SudokuData @Inject constructor(){
@@ -48,6 +49,18 @@ class SudokuData @Inject constructor(){
     fun removeValue(index: Int, value: Int) {
         sudoku[index].value = 0
         digitsToFind++
+    }
 
+    fun updatePossibilty(index: Int, value : Int){
+        val possibility = sudoku[index].possibility
+        Log.d("tom971", "${sudoku[index].possibility} ${possibility.contains(value)} $value")
+        if(possibility.contains(value)){
+            val result = possibility.remove(value)
+            Log.d("tom971", "renove $result")
+        }else{
+            val result = possibility.add(value)
+            Log.d("tom971", "add $result")
+        }
+        Log.d("tom971", "${sudoku[index].possibility}")
     }
 }

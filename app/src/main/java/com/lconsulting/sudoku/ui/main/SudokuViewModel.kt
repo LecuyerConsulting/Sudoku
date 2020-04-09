@@ -1,5 +1,6 @@
 package com.lconsulting.sudoku.ui.main
 
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,6 +16,10 @@ sealed class SudokuState {
         val sudoku: Array<SquareData>, val idRes: Int, val value: Int,
         val isFirstItem: Boolean, val isLastItem: Boolean,
         val listSquareData: MutableList<SquareData>
+    ) : SudokuState()
+
+    class ModifyPossibility(
+        val sudoku: Array<SquareData>
     ) : SudokuState()
 
     class SuccessAlgo(
@@ -59,6 +64,7 @@ sealed class SudokuState {
  *
  */
 
+
 class SudokuViewModel : ViewModel() {
 
     private val caretaker: Caretaker = Caretaker()
@@ -69,6 +75,7 @@ class SudokuViewModel : ViewModel() {
     lateinit var sudokuData: SudokuData
 
     private var mIdColorRes = R.color.colorText
+    private var mIdMode = MODE_INSERT
 
     /**
      * reset sudoku to default values
@@ -104,32 +111,40 @@ class SudokuViewModel : ViewModel() {
     fun insertValueByUser(sValue: String, idGrid: Int, idSquare: Int) {
         if (sValue != "0") {
 
+            val newValue = sValue.toInt()
             val index = getIndex(idGrid, idSquare)
 
-            val newValue = sValue.toInt()
-            val oldValue = sudokuData[index].value
+            Log.d("tom971", "insertValueByUser $mIdMode")
 
-            if (oldValue != 0) {
-                removeValue(oldValue, index)
-            }
+            if (mIdMode == MODE_INSERT) {
+                val oldValue = sudokuData[index].value
 
-            if (newValue != oldValue) {
-                addValue(newValue, mIdColorRes, index)
-            }
+                if (oldValue != 0) {
+                    removeValue(oldValue, index)
+                }
 
-            saveState(newValue, idGrid, idSquare, mIdColorRes)
+                if (newValue != oldValue) {
+                    addValue(newValue, mIdColorRes, index)
+                }
 
-            state.postValue(
-                SudokuState.FillSquare(
-                    sudokuData.sudoku,
-                    R.string.insert_value,
-                    newValue,
-                    caretaker.isFirstItem(),
-                    caretaker.isLastItem(),
-                    getListSquareByIdGrid(idGrid)
+                saveState(newValue, idGrid, idSquare, mIdColorRes)
+
+                state.postValue(
+                    SudokuState.FillSquare(
+                        sudokuData.sudoku,
+                        R.string.insert_value,
+                        newValue,
+                        caretaker.isFirstItem(),
+                        caretaker.isLastItem(),
+                        getListSquareByIdGrid(idGrid)
+                    )
                 )
-            )
+            } else if (mIdMode == MODE_UPDATE) {
+                sudokuData.updatePossibilty(index, newValue)
+                state.postValue(SudokuState.ModifyPossibility(sudokuData.sudoku))
+            }
         }
+
     }
 
     /**
@@ -1102,9 +1117,13 @@ class SudokuViewModel : ViewModel() {
         state.postValue(SudokuState.RefreshTouchPad(getListSquareByIdGrid(idGrid)))
     }
 
-    fun updateColor(idRes: Int){
+    fun updateColor(idRes: Int) {
         mIdColorRes = idRes
     }
 
+    fun updateMode(@StateMode idMode: Int) {
+        mIdMode = idMode
+        Log.d("tom971", "updateMode $mIdMode")
+    }
 
 }

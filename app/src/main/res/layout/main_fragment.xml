@@ -104,7 +104,8 @@
             android:id="@+id/cb_default"
             android:layout_width="@dimen/size_button"
             android:layout_height="@dimen/size_button"
-            android:button="@drawable/selector_value1" />
+            android:button="@drawable/selector_value1"
+            android:checked="true"/>
 
         <RadioButton
             android:id="@+id/cb_find"
@@ -119,7 +120,8 @@
             android:button="@drawable/selector_value3" />
     </RadioGroup>
 
-    <LinearLayout
+    <RadioGroup
+        android:id="@+id/rgModeChoice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -128,21 +130,24 @@
         app:layout_constraintStart_toEndOf="@+id/vTouchPad"
         app:layout_constraintTop_toTopOf="@+id/vTouchPad">
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <RadioButton
+            android:id="@+id/cb_modify_value"
             android:layout_width="@dimen/size_button"
             android:layout_height="@dimen/size_button"
-            android:src="@drawable/baseline_grid_on_black_24" />
+            android:button="@drawable/selector_value"
+            android:checked="true"/>
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <RadioButton
+            android:id="@+id/cb_light_value"
             android:layout_width="@dimen/size_button"
             android:layout_height="@dimen/size_button"
-            android:src="@drawable/baseline_wb_sunny_black_24" />
+            android:button="@drawable/selector_light" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <RadioButton
+            android:id="@+id/cb_modify_possibility"
             android:layout_width="@dimen/size_button"
             android:layout_height="@dimen/size_button"
-            android:src="@drawable/baseline_grid_on_black_24" />
-    </LinearLayout>
-
+            android:button="@drawable/selector_possibility" />
+    </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

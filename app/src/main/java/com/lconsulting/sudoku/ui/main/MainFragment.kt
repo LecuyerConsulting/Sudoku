@@ -19,17 +19,22 @@ import com.lconsulting.sudoku.ui.view.TouchPadViewListener
 import kotlinx.android.synthetic.main.main_fragment.*
 import javax.inject.Inject
 
+@IntDef(MODE_INSERT, MODE_UPDATE, MODE_LIGHT)
+@Retention(AnnotationRetention.SOURCE)
+annotation class StateMode
+const val MODE_INSERT = 0
+const val MODE_UPDATE = 1
+const val MODE_LIGHT = 2
+
+@IntDef(PLAY, STOP)
+@Retention(AnnotationRetention.SOURCE)
+annotation class StateResolver
+const val PLAY = 0
+const val STOP = 1
+
 class MainFragment : Fragment() {
 
     companion object {
-
-        @IntDef(PLAY, STOP)
-        @Retention(AnnotationRetention.SOURCE)
-        annotation class StateResolver
-
-        const val PLAY = 0
-        const val STOP = 1
-
         fun newInstance() = MainFragment()
     }
 
@@ -104,7 +109,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private val onCheckedChangeListener =
+    private val onCheckedChangeColorListener =
         RadioGroup.OnCheckedChangeListener { group, checkedId ->
             viewModel.updateColor(
                 when (checkedId) {
@@ -114,6 +119,19 @@ class MainFragment : Fragment() {
 
                 }
             )
+        }
+
+    private val onCheckedChangeModeListener =
+        RadioGroup.OnCheckedChangeListener { group, checkedId ->
+            viewModel.updateMode(
+                when (checkedId) {
+                    R.id.cb_light_value -> MODE_LIGHT
+                    R.id.cb_modify_possibility -> MODE_UPDATE
+                    else -> MODE_INSERT
+
+                }
+            )
+
         }
 
     override fun onAttach(context: Context) {
@@ -143,7 +161,8 @@ class MainFragment : Fragment() {
         }
         sudoku.setOnSudokuListener(onSudokuListener)
         constraintLayout.setOnClickListener(onClickListener)
-        rgColorChoice.setOnCheckedChangeListener(onCheckedChangeListener)
+        rgColorChoice.setOnCheckedChangeListener(onCheckedChangeColorListener)
+        rgModeChoice.setOnCheckedChangeListener(onCheckedChangeModeListener)
 
         hideActionButton()
     }
@@ -267,6 +286,9 @@ class MainFragment : Fragment() {
                 vTouchPad.refreshValues(state.listSquareData)
                 tvState.text = resources.getString(state.idRes, state.value)
                 displayActionButton(state.isFirstItem, state.isLastItem)
+            }
+            is SudokuState.ModifyPossibility -> {
+                sudoku.updateSudoku(state.sudoku)
             }
             is SudokuState.SuccessAlgo -> {
                 val listValueSelected = state.listValueSelected.toList()
